@@ -1,0 +1,1826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Iwe: book collections and dues tracking for class reps. Works offline.">
+<title>Iwe — Book Collections &amp; Dues</title>
+<style>
+:root{
+  --bg:#f3ecdc; --card:#fffdf6; --ink:#2b2320; --muted:#7a6f5c; --line:#ddd2b8;
+  --acc:#8f2f3c; --danger:#b3261e; --amber:#8a5a00;
+  --amber-bg:#fbf0d3; --green-bg:#e4efe3; --red-bg:#fbe9e7;
+  --brand-deep:#6e2430; --row-line:#eadfc3;
+  --shadow:0 1px 2px rgba(60,40,40,.07),0 6px 18px rgba(60,40,40,.06);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.5}
+.wrap{max-width:660px;margin:0 auto;padding:0 16px}
+header.app{position:sticky;top:0;z-index:5;background:var(--brand-deep);color:#fff;
+  box-shadow:0 2px 12px rgba(110,36,48,.4)}
+header.app .wrap{padding-top:14px;padding-bottom:13px}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:26px;margin:0;letter-spacing:.01em}
+.sub{margin:2px 0 0;color:rgba(255,255,255,.72);font-size:13px}
+main.wrap{padding-bottom:130px}
+section.tab{padding-top:16px}
+section.tab[hidden]{display:none}
+h2{font-size:14px;font-weight:750;margin:20px 0 8px;letter-spacing:.005em}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 8px}
+.sec-head h2{margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.stat .k{font-size:12px;font-weight:650;color:var(--muted)}
+.stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;letter-spacing:-.01em}
+#stOut{color:var(--danger)}
+.list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--row-line);min-height:54px}
+.row:last-child{border-bottom:0}
+@media(hover:hover){.row:hover{background:#faf5e6}}
+.row .grow{flex:1;min-width:0}
+.row .t{font-weight:650;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .s{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .btns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.empty{padding:24px 16px;text-align:center;color:var(--muted);font-size:14px}
+.pill{display:inline-block;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;white-space:nowrap;letter-spacing:.01em}
+.paid{background:var(--green-bg);color:var(--acc)}
+.partial{background:var(--amber-bg);color:var(--amber)}
+.unpaid{background:var(--red-bg);color:var(--danger)}
+.money{font-variant-numeric:tabular-nums;font-weight:750}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+input[type=text],input[type=search],input[type=number],input[type=date],input[type=tel],select,textarea{
+  font:inherit;font-size:16px;padding:11px 12px;border:1px solid #c8bfa1;border-radius:12px;
+  background:#fff;color:var(--ink);width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.search{flex:1;min-width:150px}
+.btn{font:inherit;font-size:15px;font-weight:650;border:1px solid transparent;border-radius:12px;
+  padding:11px 16px;min-height:44px;cursor:pointer;background:var(--acc);color:#fff;
+  box-shadow:0 1px 3px rgba(143,47,60,.35)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn-ghost{background:#fff;border-color:#c8bfa1;color:var(--ink);box-shadow:none}
+.btn-danger{background:#fff;border-color:#e0a9a4;color:var(--danger);box-shadow:none}
+.btn-light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.55);color:#fff;box-shadow:none}
+.btn-sm{padding:7px 12px;min-height:36px;font-size:14px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:#fffdf6;border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(35,40,32,.08)}
+nav.tabs .in{max-width:660px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{font:inherit;background:none;border:0;border-top:3px solid transparent;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px 12px;font-size:12px;font-weight:650;color:var(--muted);cursor:pointer;min-height:66px}
+nav.tabs button svg{width:23px;height:23px}
+nav.tabs button[aria-current=page]{color:var(--acc);border-top-color:var(--acc)}
+dialog{border:1px solid var(--line);border-radius:20px;padding:0;max-width:440px;width:calc(100% - 28px);
+  box-shadow:0 18px 50px rgba(20,30,20,.3)}
+dialog::backdrop{background:rgba(24,32,22,.55)}
+.head-in{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.credit{text-align:center;font-size:13px;color:var(--muted);margin:24px 0 6px;padding-top:14px;border-top:1px solid var(--line)}
+.credit a,.dlg-body .kv a{color:var(--acc);font-weight:600}
+.dlg-body{padding:20px}
+.dlg-body h3{margin:0 0 14px;font-size:18px;font-weight:750}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}
+.field .hint{font-size:12px;color:var(--muted);margin-top:4px}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:#202825;color:#fff;
+  padding:11px 18px;border-radius:12px;font-size:14px;font-weight:650;opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:20;max-width:calc(100% - 32px);text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#toast.show{opacity:1}
+.note{font-size:13px;color:var(--muted)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.kv:last-child{border-bottom:0}
+.check{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:650;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:#8f2f3c;flex-shrink:0}
+.kv input[type=checkbox]{width:20px;height:20px;accent-color:#8f2f3c;vertical-align:-4px;margin-right:8px}
+.row.pager{justify-content:center;gap:14px}
+.row.pager .pg{font-size:14px;color:var(--muted);white-space:nowrap}
+.row.pager .btn:disabled{opacity:.45;cursor:default}
+.pline{display:flex;gap:6px;margin-bottom:8px}
+.pline select{flex:1;min-width:0}
+.pline input{width:64px;flex-shrink:0}
+@media print{
+  header.app,main.wrap,nav.tabs,#toast,.dlg-actions{display:none!important}
+  body{background:#fff}
+  dialog{border:none;max-width:100%;width:100%;box-shadow:none}
+  dialog::backdrop{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (min-width:700px){h1{font-size:28px}}
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="wrap head-in">
+    <div>
+      <h1>Iwe</h1>
+      <p class="sub">Book collections &amp; dues &middot; works offline on this device</p>
+    </div>
+    <button type="button" class="btn btn-light btn-sm" data-action="about-open">About</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="note" id="storeNote" hidden></p>
+
+  <section class="tab" id="tab-home" aria-label="Overview">
+    <h2>Overview</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Coursemates</div><div class="v" id="stMates">0</div></div>
+      <div class="stat"><div class="k">Books collected</div><div class="v" id="stBooks">₦0</div></div>
+      <div class="stat"><div class="k">Dues collected</div><div class="v" id="stDues">₦0</div></div>
+      <div class="stat"><div class="k">Still outstanding</div><div class="v" id="stOut">₦0</div></div>
+    </div>
+
+    <div class="sec-head"><h2>Needs attention</h2><span class="note" id="attCount"></span></div>
+    <div class="list" id="attention"></div>
+
+    <h2>Data backup</h2>
+    <div class="card">
+      <p class="note" style="margin-top:0">All records stay in this browser (IndexedDB). Export a backup before clearing browser data or switching devices.</p>
+      <div class="toolbar" style="margin-bottom:0">
+        <button type="button" class="btn btn-ghost btn-sm" id="btnExportAll">Export backup (JSON)</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnImportAll">Import backup</button>
+        <button type="button" class="btn btn-danger btn-sm" id="btnWipe">Erase everything</button>
+      </div>
+      <input type="file" id="fileBackup" accept="application/json,.json" hidden>
+    </div>
+
+    <footer class="credit">Built by <strong>Inioluwa Olayoriju</strong> &middot; <a href="tel:+2349133770970">+234 9133770970</a></footer>
+  </section>
+
+  <section class="tab" id="tab-mates" aria-label="Coursemates" hidden>
+    <div class="sec-head">
+      <h2>Coursemates <span class="note" id="mateCount"></span></h2>
+      <button type="button" class="btn btn-sm" data-action="mate-add">+ Add</button>
+    </div>
+    <div class="toolbar">
+      <input type="search" class="search" id="mateSearch" placeholder="Search name or matric no…" aria-label="Search coursemates">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnExpMates">Export CSV</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnImpMates">Import CSV</button>
+      <input type="file" id="fileMates" accept=".csv,text/csv" hidden>
+    </div>
+    <p class="note">Add all coursemates once, then tap a name anywhere to record a book sale or dues payment.</p>
+    <div class="list" id="mateList"></div>
+  </section>
+
+  <section class="tab" id="tab-books" aria-label="Books" hidden>
+    <div class="sec-head">
+      <h2>Book catalog</h2>
+      <button type="button" class="btn btn-sm" data-action="book-add">+ Add book</button>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnExpBooks">Export catalog</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnImpBooks">Import catalog</button>
+      <input type="file" id="fileBooks" accept=".csv,text/csv" hidden>
+    </div>
+    <div class="list" id="bookList"></div>
+
+    <div class="sec-head">
+      <h2>Purchases</h2>
+      <button type="button" class="btn btn-sm" data-action="pur-add">+ Record sale</button>
+    </div>
+    <div class="toolbar">
+      <select id="purFilter" aria-label="Filter purchases" style="flex:1;min-width:140px">
+        <option value="all">All purchases</option>
+        <option value="paid">Paid</option>
+        <option value="partial">Partly paid</option>
+        <option value="unpaid">Unpaid</option>
+      </select>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnExpPur">Export CSV</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnImpPur">Import CSV</button>
+      <input type="file" id="filePur" accept=".csv,text/csv" hidden>
+    </div>
+    <div class="list" id="purList"></div>
+  </section>
+
+  <section class="tab" id="tab-dues" aria-label="Dues" hidden>
+    <div class="sec-head">
+      <h2>Levies &amp; dues</h2>
+      <button type="button" class="btn btn-sm" data-action="levy-add">+ Add levy</button>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnExpLev">Export levies</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnImpLev">Import levies</button>
+      <input type="file" id="fileLev" accept=".csv,text/csv" hidden>
+    </div>
+    <div class="list" id="levyList"></div>
+
+    <div class="sec-head">
+      <h2>Who has paid</h2>
+      <button type="button" class="btn btn-sm" data-action="pay-add">+ Record payment</button>
+    </div>
+    <div class="toolbar">
+      <select id="levySel" aria-label="Choose levy" style="flex:2;min-width:150px"></select>
+      <select id="dueFilter" aria-label="Filter payments" style="flex:1;min-width:130px">
+        <option value="all">Everyone</option>
+        <option value="paid">Paid</option>
+        <option value="unpaid">Unpaid / partial</option>
+      </select>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnExpPay">Export payments</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnImpPay">Import payments</button>
+      <input type="file" id="filePay" accept=".csv,text/csv" hidden>
+    </div>
+    <div class="list" id="dueList"></div>
+
+    <h2>Overdue reminders</h2>
+    <div class="list" id="overList"></div>
+  </section>
+</main>
+
+<dialog id="dlgMate">
+  <div class="dlg-body">
+    <h3 id="mateDlgTitle">Add coursemate</h3>
+    <form id="formMate">
+      <input type="hidden" id="mId">
+      <div class="field"><label for="mName">Full name</label><input type="text" id="mName" required autocomplete="off"></div>
+      <div class="field"><label for="mMatric">Matric number</label><input type="text" id="mMatric" required autocomplete="off"><p class="hint">Used to match rows when importing payments.</p></div>
+      <div class="field"><label for="mPhone">Phone (optional)</label><input type="tel" id="mPhone" autocomplete="off"></div>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgBook">
+  <div class="dlg-body">
+    <h3 id="bookDlgTitle">Add book</h3>
+    <form id="formBook">
+      <input type="hidden" id="bId">
+      <div class="field"><label for="bTitle">Book title</label><input type="text" id="bTitle" required autocomplete="off"></div>
+      <div class="field"><label for="bPrice">Price (₦)</label><input type="number" id="bPrice" min="0" step="1" required></div>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgPurchase">
+  <div class="dlg-body">
+    <h3 id="purDlgTitle">Record book sale</h3>
+    <form id="formPur">
+      <input type="hidden" id="pId">
+      <div class="field"><label>Books</label><div id="pLines"></div><button type="button" class="btn btn-ghost btn-sm" id="btnAddLine">+ Add another book</button><p class="hint" id="pTotalHint">Total: ₦0</p></div>
+      <div class="field"><label for="pMate">Coursemate (type to search)</label><input type="text" id="pMate" list="dlMates" required autocomplete="off" placeholder="Name or matric no"><p class="hint">Pick from the coursemate list, or add them first under Coursemates.</p></div>
+      <div class="field"><label for="pPaid">Amount paid (₦)</label><input type="number" id="pPaid" min="0" step="1" value="0" required><p class="hint">Split across the books above, in order.</p></div>
+      <div class="field"><label class="check"><input type="checkbox" id="pBought"><span>Bought — paid in full</span></label><p class="hint">Tick this when the book is fully paid for; the amount fills in automatically.</p></div>
+      <div class="field"><label for="pDate">Date</label><input type="date" id="pDate" required></div>
+      <div class="field"><label for="pNote">Note (optional)</label><input type="text" id="pNote" autocomplete="off"></div>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="button" class="btn btn-ghost" id="btnPurAnother">Save + add another</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgLevy">
+  <div class="dlg-body">
+    <h3 id="levyDlgTitle">Add levy</h3>
+    <form id="formLevy">
+      <input type="hidden" id="lId">
+      <div class="field"><label for="lTitle">Levy name</label><input type="text" id="lTitle" required autocomplete="off" placeholder="e.g. Departmental dues"></div>
+      <div class="field"><label for="lAmount">Amount per person (₦)</label><input type="number" id="lAmount" min="0" step="1" required></div>
+      <div class="field"><label for="lDeadline">Deadline (optional)</label><input type="date" id="lDeadline"></div>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgPay">
+  <div class="dlg-body">
+    <h3 id="payDlgTitle">Record dues payment</h3>
+    <form id="formPay">
+      <div class="field"><label for="payLevy">Levy</label><select id="payLevy" required></select></div>
+      <div class="field"><label for="payMate">Coursemate (type to search)</label><input type="text" id="payMate" list="dlMates" required autocomplete="off" placeholder="Name or matric no"></div>
+      <div class="field"><label for="payAmt">Amount paid (₦)</label><input type="number" id="payAmt" min="0" step="1" required></div>
+      <div class="field"><label for="payDate">Date</label><input type="date" id="payDate" required></div>
+      <div class="field"><label for="payNote">Note (optional)</label><input type="text" id="payNote" autocomplete="off"></div>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" data-action="close">Cancel</button>
+        <button type="submit" class="btn">Save</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="dlgReceipt">
+  <div class="dlg-body">
+    <div id="receiptBody"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn btn-ghost" data-action="close">Close</button>
+      <button type="button" class="btn btn-ghost" id="btnReceiptCopy">Copy</button>
+      <button type="button" class="btn btn-ghost" id="btnReceiptShare" hidden>Share</button>
+      <button type="button" class="btn" id="btnReceiptPrint">Print</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlgAbout">
+  <div class="dlg-body">
+    <h3>About Book Manager</h3>
+    <div class="kv"><span>App</span><strong>Book Manager</strong></div>
+    <div class="kv"><span>Purpose</span><span>Class book collections &amp; dues</span></div>
+    <div class="kv"><span>Built by</span><strong>Inioluwa Olayoriju</strong></div>
+    <div class="kv"><span>Contact</span><a href="tel:+2349133770970">+234 9133770970</a></div>
+    <p class="note">All records stay offline in this browser. Export a backup regularly.</p>
+    <div class="dlg-actions">
+      <button type="button" class="btn" data-action="close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlgDetail">
+  <div class="dlg-body">
+    <h3 id="detTitle">Details</h3>
+    <div id="detBody"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn btn-ghost" data-action="close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<datalist id="dlMates"></datalist>
+
+<nav class="tabs" aria-label="Main">
+  <div class="in">
+    <button type="button" data-action="tab" data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 3l9 8.5"/><path d="M5.5 10.5V21h5v-6h3v6h5V10.5"/></svg>Home</button>
+    <button type="button" data-action="tab" data-tab="mates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c.6-3.4 3-5.4 6.2-5.4s5.6 2 6.2 5.4"/><circle cx="17" cy="9" r="2.6"/><path d="M15.8 14.7c2.9.3 5.1 2.4 5.6 5.3"/></svg>Coursemates</button>
+    <button type="button" data-action="tab" data-tab="books"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 4.7 7.2 4.2 4 5v13.5c3.2-.8 6-.3 8 1.5 2-1.8 4.8-2.3 8-1.5V5c-3.2-.8-6-.3-8 1.5z"/><path d="M12 6.5V20"/></svg>Books</button>
+    <button type="button" data-action="tab" data-tab="dues"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.4"/><path d="M6 9.5h.01M18 14.5h.01"/></svg>Dues</button>
+  </div>
+</nav>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ===== Utilities ===== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtN = (n) => '₦' + Number(n || 0).toLocaleString('en-US');
+const uid = () => {
+  try { if (typeof crypto !== 'undefined' && crypto && crypto.randomUUID) return crypto.randomUUID(); }
+  catch (e) { /* fall through */ }
+  return 'id-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
+};
+const todayStr = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+};
+const datePlus = (days) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+};
+const norm = (s) => String(s == null ? '' : s).trim().toLowerCase();
+let toastTimer = null;
+function toast(msg) {
+  const t = $('toast');
+  if (!t) return;
+  t.textContent = msg;
+  if (t.classList) t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { if (t.classList) t.classList.remove('show'); }, 2200);
+}
+
+/* ===== Storage: IndexedDB with in-memory fallback ===== */
+const DB_NAME = 'book-manager-db';
+const DB_VER = 3;
+const STORE_NAMES = ['mates', 'books', 'purchases', 'levies', 'dues'];
+const memStores = {};
+STORE_NAMES.forEach((n) => { memStores[n] = new Map(); });
+let db = null;
+let memMode = false;
+const hasIdb = () => {
+  try { return typeof indexedDB !== 'undefined' && indexedDB !== null; }
+  catch (e) { return false; }
+};
+function openDb() {
+  return new Promise((resolve, reject) => {
+    try {
+      const req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = () => {
+        const d = req.result;
+        STORE_NAMES.forEach((n) => {
+          if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, { keyPath: 'id' });
+        });
+        if (d.objectStoreNames.contains('expenses')) d.deleteObjectStore('expenses');
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('IndexedDB open failed'));
+    } catch (e) { reject(e); }
+  });
+}
+function txRun(store, mode, fn) {
+  return new Promise((resolve, reject) => {
+    let req;
+    try {
+      const t = db.transaction(store, mode);
+      req = fn(t.objectStore(store));
+      t.oncomplete = () => resolve(req && 'result' in Object(req) ? req.result : undefined);
+      t.onerror = () => reject(t.error || new Error('IndexedDB transaction failed'));
+    } catch (e) { reject(e); }
+  });
+}
+async function dbAll(name) {
+  if (memMode) return Array.from(memStores[name].values());
+  return txRun(name, 'readonly', (s) => s.getAll());
+}
+async function dbPut(name, val) {
+  if (memMode) { memStores[name].set(val.id, val); return; }
+  return txRun(name, 'readwrite', (s) => s.put(val));
+}
+async function dbDel(name, id) {
+  if (memMode) { memStores[name].delete(id); return; }
+  return txRun(name, 'readwrite', (s) => s.delete(id));
+}
+async function dbClear(name) {
+  if (memMode) { memStores[name].clear(); return; }
+  return txRun(name, 'readwrite', (s) => s.clear());
+}
+/* ===== State ===== */
+let mates = [];
+let books = [];
+let purchases = [];
+let levies = [];
+let dues = [];
+let selectedLevy = '';
+const PAGE_SIZE = 10;
+const pages = { mates: 1, pur: 1, due: 1 };
+
+async function loadAll() {
+  const r = await Promise.all([dbAll('mates'), dbAll('books'), dbAll('purchases'), dbAll('levies'), dbAll('dues')]);
+  mates = r[0]; books = r[1]; purchases = r[2]; levies = r[3]; dues = r[4];
+}
+
+/* ===== Lookups & computed values ===== */
+const mateById = (id) => mates.find((m) => m.id === id);
+const bookById = (id) => books.find((b) => b.id === id);
+const levyById = (id) => levies.find((l) => l.id === id);
+const mateByMatric = (s) => mates.find((m) => norm(m.matric) === norm(s));
+const bookByTitle = (s) => books.find((b) => norm(b.title) === norm(s));
+const levyByTitle = (s) => levies.find((l) => norm(l.title) === norm(s));
+
+function resolveMate(input) {
+  const t = String(input == null ? '' : input).trim();
+  if (!t) return null;
+  let m = mates.find((x) => (x.matric + ' · ' + x.name) === t);
+  if (m) return m;
+  m = mateByMatric(t);
+  if (m) return m;
+  const nl = norm(t);
+  const byName = mates.filter((x) => norm(x.name) === nl);
+  if (byName.length === 1) return byName[0];
+  return null;
+}
+
+const purchaseTotal = (p) => Number(p.unitPrice || 0) * Number(p.qty || 0);
+function purchaseStatus(p) {
+  const total = purchaseTotal(p);
+  const paid = Number(p.paid || 0);
+  if (paid >= total) return 'paid';
+  if (paid > 0) return 'partial';
+  return 'unpaid';
+}
+const STATUS_LABEL = { paid: 'Paid', partial: 'Partial', unpaid: 'Unpaid' };
+
+function duePaidFor(levyId, mateId) {
+  return dues.filter((d) => d.levyId === levyId && d.mateId === mateId)
+    .reduce((s, d) => s + Number(d.paid || 0), 0);
+}
+function levyStatusFor(levy, mateId) {
+  const paid = duePaidFor(levy.id, mateId);
+  const amt = Number(levy.amount || 0);
+  if (paid >= amt) return 'paid';
+  if (paid > 0) return 'partial';
+  return 'unpaid';
+}
+function mateBookBalance(mateId) {
+  return purchases.filter((p) => p.mateId === mateId)
+    .reduce((s, p) => s + (purchaseTotal(p) - Number(p.paid || 0)), 0);
+}
+function mateDueBalance(mateId) {
+  return levies.reduce((s, l) => s + Math.max(0, Number(l.amount || 0) - duePaidFor(l.id, mateId)), 0);
+}
+const mateBalance = (mateId) => mateBookBalance(mateId) + mateDueBalance(mateId);
+
+/* ===== Pagination ===== */
+function pageCountFor(total) {
+  return Math.max(1, Math.ceil(total / PAGE_SIZE));
+}
+function clampPage(target, total) {
+  const pg = Math.min(Math.max(1, pages[target] || 1), pageCountFor(total));
+  pages[target] = pg;
+  return pg;
+}
+function pageSlice(list, target) {
+  const pg = clampPage(target, list.length);
+  return list.slice((pg - 1) * PAGE_SIZE, pg * PAGE_SIZE);
+}
+function pagerHTML(target, total) {
+  const pc = pageCountFor(total);
+  if (pc < 2) return '';
+  const pg = clampPage(target, total);
+  return '<div class="row pager"><button type="button" class="btn btn-ghost btn-sm" data-action="page" data-id="' + target + ':prev"' +
+    (pg <= 1 ? ' disabled' : '') + ' aria-label="Previous page">‹ Prev</button>' +
+    '<span class="pg">Page ' + pg + ' of ' + pc + '</span>' +
+    '<button type="button" class="btn btn-ghost btn-sm" data-action="page" data-id="' + target + ':next"' +
+    (pg >= pc ? ' disabled' : '') + ' aria-label="Next page">Next ›</button></div>';
+}
+function turnPage(target, dir) {
+  if (!(target in pages)) return;
+  pages[target] += dir === 'next' ? 1 : -1;
+  renderAll();
+}
+
+/* ===== Rendering ===== */
+function statusPill(st) {
+  return '<span class="pill ' + st + '">' + STATUS_LABEL[st] + '</span>';
+}
+function emptyRow(msg) {
+  return '<div class="empty">' + esc(msg) + '</div>';
+}
+
+function renderDashboard() {
+  $('stMates').textContent = String(mates.length);
+  const booksPaid = purchases.reduce((s, p) => s + Number(p.paid || 0), 0);
+  const booksTotal = purchases.reduce((s, p) => s + purchaseTotal(p), 0);
+  const duesPaid = dues.reduce((s, d) => s + Number(d.paid || 0), 0);
+  const duesTotal = levies.reduce((s, l) => s + Number(l.amount || 0) * mates.length, 0);
+  $('stBooks').textContent = String(purchases.reduce((s, p) => s + Number(p.qty || 0), 0));
+  $('stDues').textContent = fmtN(duesPaid);
+  $('stOut').textContent = fmtN(Math.max(0, booksTotal - booksPaid) + Math.max(0, duesTotal - duesPaid));
+
+  const debtors = mates
+    .map((m) => ({ m, bal: mateBalance(m.id) }))
+    .filter((x) => x.bal > 0)
+    .sort((a, b) => b.bal - a.bal)
+    .slice(0, 8);
+  $('attCount').textContent = debtors.length ? debtors.length + ' outstanding' : '';
+  $('attention').innerHTML = debtors.length ? debtors.map((x) =>
+    '<div class="row"><div class="grow"><div class="t">' + esc(x.m.name) + '</div>' +
+    '<div class="s">' + esc(x.m.matric) + '</div></div>' +
+    '<span class="money">' + fmtN(x.bal) + '</span>' +
+    '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="mate-view" data-id="' + esc(x.m.id) + '">View</button></span></div>'
+  ).join('') : emptyRow('Everyone is settled. Nothing outstanding.');
+
+}
+
+function renderMates() {
+  const q = norm($('mateSearch') ? $('mateSearch').value : '');
+  const list = mates
+    .filter((m) => !q || norm(m.name).indexOf(q) !== -1 || norm(m.matric).indexOf(q) !== -1)
+    .slice()
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  $('mateCount').textContent = mates.length ? '(' + mates.length + ')' : '';
+  $('mateList').innerHTML = list.length ? pageSlice(list, 'mates').map((m) => {
+    const bal = mateBalance(m.id);
+    const right = bal > 0
+      ? '<span class="money">' + fmtN(bal) + '</span>'
+      : '<span class="pill paid">Settled</span>';
+    return '<div class="row"><div class="grow"><div class="t">' + esc(m.name) + '</div>' +
+      '<div class="s">' + esc(m.matric) + (m.phone ? ' &middot; ' + esc(m.phone) : '') + '</div></div>' +
+      right +
+      '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="mate-view" data-id="' + esc(m.id) + '">View</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="receipt-open" data-id="' + esc(m.id) + '">Receipt</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="mate-edit" data-id="' + esc(m.id) + '">Edit</button></span></div>';
+  }).join('') + pagerHTML('mates', list.length) : emptyRow(mates.length ? 'No coursemates match this search.' : 'No coursemates yet. Add your coursemates to begin.');
+  $('dlMates').innerHTML = mates.map((m) =>
+    '<option value="' + esc(m.matric + ' · ' + m.name) + '">').join('');
+}
+
+function renderBooks() {
+  $('bookList').innerHTML = books.length ? books.map((b) => {
+    const sold = purchases.filter((p) => p.bookId === b.id);
+    const got = sold.reduce((s, p) => s + Number(p.paid || 0), 0);
+    return '<div class="row"><div class="grow"><div class="t">' + esc(b.title) + '</div>' +
+      '<div class="s">' + sold.length + ' sale(s) &middot; ' + fmtN(got) + ' collected</div></div>' +
+      '<span class="money">' + fmtN(b.price) + '</span>' +
+      '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="book-edit" data-id="' + esc(b.id) + '">Edit</button>' +
+      '<button type="button" class="btn btn-danger btn-sm" data-action="book-del" data-id="' + esc(b.id) + '">Del</button></span></div>';
+  }).join('') : emptyRow('No books yet. Add the books the class will buy.');
+
+  const f = $('purFilter') ? $('purFilter').value : 'all';
+  const list = purchases.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const shown = list.filter((p) => f === 'all' || purchaseStatus(p) === f);
+  $('purList').innerHTML = shown.length ? pageSlice(shown, 'pur').map((p) => {
+    const m = mateById(p.mateId);
+    const st = purchaseStatus(p);
+    return '<div class="row"><div class="grow"><div class="t">' + esc(m ? m.name : 'Unknown') + ' — ' + esc(p.bookTitle) + ' ×' + esc(p.qty) + '</div>' +
+      '<div class="s">' + esc(p.date) + (p.note ? ' &middot; ' + esc(p.note) : '') + '</div></div>' +
+      '<span class="money">' + fmtN(p.paid) + ' / ' + fmtN(purchaseTotal(p)) + '</span>' +
+      statusPill(st) +
+      '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="pur-receipt" data-id="' + esc(p.id) + '">Receipt</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="pur-edit" data-id="' + esc(p.id) + '">Edit</button>' +
+      '<button type="button" class="btn btn-danger btn-sm" data-action="pur-del" data-id="' + esc(p.id) + '">Del</button></span></div>';
+  }).join('') + pagerHTML('pur', shown.length) : emptyRow(purchases.length ? 'No purchases with this status.' : 'No sales recorded yet.');
+}
+
+function renderDues() {
+  $('levyList').innerHTML = levies.length ? levies.map((l) => {
+    const got = dues.filter((d) => d.levyId === l.id).reduce((s, d) => s + Number(d.paid || 0), 0);
+    const count = mates.filter((m) => levyStatusFor(l, m.id) === 'paid').length;
+    return '<div class="row"><div class="grow"><div class="t">' + esc(l.title) + '</div>' +
+      '<div class="s">' + count + ' of ' + mates.length + ' paid' + (l.deadline ? ' &middot; due ' + esc(l.deadline) : '') + '</div></div>' +
+      '<span class="money">' + fmtN(got) + '</span>' +
+      '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="levy-pick" data-id="' + esc(l.id) + '">View</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="levy-edit" data-id="' + esc(l.id) + '">Edit</button>' +
+      '<button type="button" class="btn btn-danger btn-sm" data-action="levy-del" data-id="' + esc(l.id) + '">Del</button></span></div>';
+  }).join('') : emptyRow('No levies yet. Add a levy, e.g. “Departmental dues”.');
+
+  const sel = $('levySel');
+  if (sel) {
+    sel.innerHTML = levies.map((l) => '<option value="' + esc(l.id) + '">' + esc(l.title) + '</option>').join('');
+    if (!levyById(selectedLevy)) selectedLevy = levies.length ? levies[0].id : '';
+    sel.value = selectedLevy;
+  }
+  $('payLevy').innerHTML = levies.map((l) =>
+    '<option value="' + esc(l.id) + '">' + esc(l.title) + ' — ' + fmtN(l.amount) + '</option>').join('');
+
+  const levy = levyById(selectedLevy);
+  const box = $('dueList');
+  if (!levy) { box.innerHTML = emptyRow('Choose or add a levy to see who has paid.'); renderOverdue(); return; }
+  const f = $('dueFilter') ? $('dueFilter').value : 'all';
+  const rows = mates.slice().sort((a, b) => String(a.name).localeCompare(String(b.name)))
+    .map((m) => ({ m, paid: duePaidFor(levy.id, m.id), st: levyStatusFor(levy, m.id) }))
+    .filter((x) => f === 'all' || (f === 'paid' ? x.st === 'paid' : x.st !== 'paid'));
+  box.innerHTML = rows.length ? pageSlice(rows, 'due').map((x) =>
+    '<div class="row"><div class="grow"><div class="t">' + esc(x.m.name) + '</div>' +
+    '<div class="s">' + esc(x.m.matric) + '</div></div>' +
+    '<span class="money">' + fmtN(x.paid) + ' / ' + fmtN(levy.amount) + '</span>' +
+    statusPill(x.st) +
+    '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="due-receipt" data-id="' + esc(levy.id + '|' + x.m.id) + '">Receipt</button>' +
+    '<button type="button" class="btn btn-ghost btn-sm" data-action="pay-edit" data-id="' + esc(levy.id + '|' + x.m.id) + '">Pay</button></span></div>'
+  ).join('') + pagerHTML('due', rows.length) : emptyRow('Nobody in this group yet.');
+  renderOverdue();
+}
+
+function renderStoreNote() {
+  const n = $('storeNote');
+  if (!n) return;
+  if (memMode) {
+    n.hidden = false;
+    n.textContent = 'Note: this browser blocked local storage, so records are kept in memory only for this session. Export a backup before leaving.';
+  } else {
+    n.hidden = true;
+    n.textContent = '';
+  }
+}
+
+function renderAll() {
+  renderDashboard();
+  renderMates();
+  renderBooks();
+  renderDues();
+  renderStoreNote();
+}
+/* ===== Core actions (used by UI and tests) ===== */
+async function saveMate(data) {
+  const row = {
+    id: data.id || uid(),
+    name: String(data.name || '').trim(),
+    matric: String(data.matric || '').trim(),
+    phone: String(data.phone || '').trim()
+  };
+  if (!row.name || !row.matric) throw new Error('Name and matric number are required.');
+  const dupe = mates.find((m) => m.id !== row.id && norm(m.matric) === norm(row.matric));
+  if (dupe) throw new Error('Matric number already exists: ' + dupe.matric);
+  await dbPut('mates', row);
+  const i = mates.findIndex((m) => m.id === row.id);
+  if (i === -1) mates.push(row); else mates[i] = row;
+  renderAll();
+  return row;
+}
+async function deleteMate(id) {
+  const m = mateById(id);
+  if (!m) return;
+  await dbDel('mates', id);
+  mates = mates.filter((x) => x.id !== id);
+  const dead1 = purchases.filter((p) => p.mateId === id);
+  const dead2 = dues.filter((d) => d.mateId === id);
+  for (const p of dead1) await dbDel('purchases', p.id);
+  for (const d of dead2) await dbDel('dues', d.id);
+  purchases = purchases.filter((p) => p.mateId !== id);
+  dues = dues.filter((d) => d.mateId !== id);
+  renderAll();
+}
+async function saveBook(data) {
+  const row = {
+    id: data.id || uid(),
+    title: String(data.title || '').trim(),
+    price: Math.max(0, Number(data.price || 0))
+  };
+  if (!row.title) throw new Error('Book title is required.');
+  await dbPut('books', row);
+  const i = books.findIndex((b) => b.id === row.id);
+  if (i === -1) books.push(row); else books[i] = row;
+  renderAll();
+  return row;
+}
+async function deleteBook(id) {
+  if (purchases.some((p) => p.bookId === id)) {
+    throw new Error('This book has recorded sales, so it cannot be deleted. Edit it instead.');
+  }
+  await dbDel('books', id);
+  books = books.filter((b) => b.id !== id);
+  renderAll();
+}
+async function savePurchase(data) {
+  const book = bookById(data.bookId);
+  if (!book) throw new Error('Choose a book from the catalog.');
+  const mate = data.mateId ? mateById(data.mateId) : resolveMate(data.mateText);
+  if (!mate) throw new Error('Pick a coursemate from the list (type name or matric).');
+  const qty = Math.max(1, parseInt(data.qty, 10) || 1);
+  const unitPrice = Number(book.price || 0);
+  const row = {
+    id: data.id || uid(),
+    mateId: mate.id,
+    bookId: book.id,
+    bookTitle: book.title,
+    unitPrice,
+    qty,
+    paid: data.bought ? unitPrice * qty : Math.max(0, Number(data.paid || 0)),
+    date: data.date || todayStr(),
+    note: String(data.note || '').trim()
+  };
+  await dbPut('purchases', row);
+  const i = purchases.findIndex((p) => p.id === row.id);
+  if (i === -1) purchases.push(row); else purchases[i] = row;
+  renderAll();
+  return row;
+}
+async function addPurchases(mate, items, opts) {
+  // items: [{book, qty}]; paidTotal is split across lines in order.
+  let remaining = Math.max(0, Number(opts.paidTotal || 0));
+  const made = [];
+  for (const it of items) {
+    const lineTotal = Number(it.book.price || 0) * it.qty;
+    const linePaid = Math.min(lineTotal, remaining);
+    remaining -= linePaid;
+    const row = {
+      id: uid(), mateId: mate.id, bookId: it.book.id, bookTitle: it.book.title,
+      unitPrice: Number(it.book.price || 0), qty: it.qty, paid: linePaid,
+      date: opts.date || todayStr(), note: String(opts.note || '').trim()
+    };
+    await dbPut('purchases', row);
+    purchases.push(row);
+    made.push(row);
+  }
+  renderAll();
+  return made;
+}
+async function deletePurchase(id) {
+  await dbDel('purchases', id);
+  purchases = purchases.filter((p) => p.id !== id);
+  renderAll();
+}
+async function toggleBought(id, on) {
+  const p = purchases.find((x) => x.id === id);
+  if (!p) return on;
+  p.paid = on ? purchaseTotal(p) : 0;
+  await dbPut('purchases', p);
+  renderAll();
+  refreshDetail(p.mateId);
+  return on;
+}
+function refreshDetail(mateId) {
+  const dd = $('dlgDetail');
+  if (dd && dd.open) { try { openMateDetail(mateId); } catch (e) { /* ignore */ } }
+}
+async function saveLevy(data) {
+  const row = {
+    id: data.id || uid(),
+    title: String(data.title || '').trim(),
+    amount: Math.max(0, Number(data.amount || 0)),
+    deadline: String(data.deadline || '').trim()
+  };
+  if (!row.title) throw new Error('Levy name is required.');
+  await dbPut('levies', row);
+  const i = levies.findIndex((l) => l.id === row.id);
+  if (i === -1) { levies.push(row); selectedLevy = row.id; } else levies[i] = row;
+  renderAll();
+  return row;
+}
+async function deleteLevy(id) {
+  if (dues.some((d) => d.levyId === id)) {
+    throw new Error('This levy has recorded payments, so it cannot be deleted. Edit it instead.');
+  }
+  await dbDel('levies', id);
+  levies = levies.filter((l) => l.id !== id);
+  if (selectedLevy === id) selectedLevy = '';
+  renderAll();
+}
+async function saveDuePayment(data) {
+  const levy = levyById(data.levyId);
+  if (!levy) throw new Error('Choose a levy first.');
+  const mate = data.mateId ? mateById(data.mateId) : resolveMate(data.mateText);
+  if (!mate) throw new Error('Pick a coursemate from the list (type name or matric).');
+  const row = {
+    id: data.id || uid(),
+    levyId: levy.id,
+    levyTitle: levy.title,
+    mateId: mate.id,
+    paid: Math.max(0, Number(data.paid || 0)),
+    date: data.date || todayStr(),
+    note: String(data.note || '').trim()
+  };
+  await dbPut('dues', row);
+  const i = dues.findIndex((d) => d.id === row.id);
+  if (i === -1) dues.push(row); else dues[i] = row;
+  selectedLevy = levy.id;
+  renderAll();
+  return row;
+}
+
+/* ===== Navigation & dialogs ===== */
+function switchTab(name) {
+  const names = ['home', 'mates', 'books', 'dues'];
+  if (names.indexOf(name) === -1) name = 'home';
+  names.forEach((n) => { $('tab-' + n).hidden = (n !== name); });
+  const btns = document.querySelectorAll('nav.tabs button');
+  for (let i = 0; i < btns.length; i++) {
+    if (btns[i].dataset && btns[i].dataset.tab === name) btns[i].setAttribute('aria-current', 'page');
+    else if (btns[i].removeAttribute) btns[i].removeAttribute('aria-current');
+  }
+  try { if (typeof location !== 'undefined' && location) location.hash = name; } catch (e) { /* ignore */ }
+}
+function openDlg(id) {
+  const d = $(id);
+  if (d && d.showModal) { try { d.showModal(); } catch (e) { /* already open */ } }
+}
+function closeDlgFrom(el) {
+  const d = el && el.closest ? el.closest('dialog') : null;
+  if (d && d.close) { try { d.close(); } catch (e) { /* ignore */ } }
+}
+function openMateDialog(id) {
+  const m = id ? mateById(id) : null;
+  $('mateDlgTitle').textContent = m ? 'Edit coursemate' : 'Add coursemate';
+  $('mId').value = m ? m.id : '';
+  $('mName').value = m ? m.name : '';
+  $('mMatric').value = m ? m.matric : '';
+  $('mPhone').value = m && m.phone ? m.phone : '';
+  openDlg('dlgMate');
+}
+function openBookDialog(id) {
+  const b = id ? bookById(id) : null;
+  $('bookDlgTitle').textContent = b ? 'Edit book' : 'Add book';
+  $('bId').value = b ? b.id : '';
+  $('bTitle').value = b ? b.title : '';
+  $('bPrice').value = b ? b.price : '';
+  openDlg('dlgBook');
+}
+function openPurchaseDialog(id, presetMateId) {
+  if (!books.length) { toast('Add a book to the catalog first.'); switchTab('books'); return; }
+  if (!mates.length) { toast('Add coursemates first.'); switchTab('mates'); return; }
+  const p = id ? purchases.find((x) => x.id === id) : null;
+  $('purDlgTitle').textContent = p ? 'Edit sale' : 'Record book sale';
+  $('pId').value = p ? p.id : '';
+  $('pLines').innerHTML = '';
+  if (p) addPurLine(p.bookId, p.qty); else addPurLine('', 1);
+  $('btnAddLine').style.display = p ? 'none' : '';
+  const pm = p ? mateById(p.mateId) : (presetMateId ? mateById(presetMateId) : null);
+  $('pMate').value = pm ? pm.matric + ' · ' + pm.name : '';
+  $('pPaid').value = p ? p.paid : 0;
+  $('pBought').checked = p ? purchaseStatus(p) === 'paid' : false;
+  $('pDate').value = p ? p.date : todayStr();
+  $('pNote').value = p && p.note ? p.note : '';
+  openDlg('dlgPurchase');
+}
+function openLevyDialog(id) {
+  const l = id ? levyById(id) : null;
+  $('levyDlgTitle').textContent = l ? 'Edit levy' : 'Add levy';
+  $('lId').value = l ? l.id : '';
+  $('lTitle').value = l ? l.title : '';
+  $('lAmount').value = l ? l.amount : '';
+  $('lDeadline').value = l && l.deadline ? l.deadline : '';
+  openDlg('dlgLevy');
+}
+function openPayDialog(levyId, mateId) {
+  if (!levies.length) { toast('Add a levy first.'); return; }
+  if (!mates.length) { toast('Add coursemates first.'); switchTab('mates'); return; }
+  const firstOpt = ($('payLevy').options && $('payLevy').options.length) ? $('payLevy').options[0].value : '';
+  $('payLevy').value = levyId || selectedLevy || firstOpt;
+  const m = mateId ? mateById(mateId) : null;
+  $('payMate').value = m ? m.matric + ' · ' + m.name : '';
+  const lv = levyById($('payLevy').value);
+  const already = (lv && m) ? duePaidFor(lv.id, m.id) : 0;
+  $('payAmt').value = (lv && m) ? Math.max(0, Number(lv.amount || 0) - already) : '';
+  $('payDate').value = todayStr();
+  $('payNote').value = '';
+  openDlg('dlgPay');
+}
+function openMateDetail(id) {
+  const m = mateById(id);
+  if (!m) return;
+  $('detTitle').textContent = m.name;
+  const mine = purchases.filter((p) => p.mateId === id).slice()
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const bookRows = mine.length ? mine.map((p) =>
+    '<div class="kv"><span><input type="checkbox" id="bt-' + esc(p.id) + '" data-action="pur-toggle" data-id="' + esc(p.id) + '"' +
+    (purchaseStatus(p) === 'paid' ? ' checked' : '') + ' aria-label="Bought: ' + esc(p.bookTitle) + '">' +
+    '<label for="bt-' + esc(p.id) + '">' + esc(p.bookTitle) + ' ×' + esc(p.qty) + ' <span class="note">' + esc(p.date) + '</span></label></span>' +
+    '<span><span class="money">' + fmtN(p.paid) + ' / ' + fmtN(purchaseTotal(p)) + '</span> ' + statusPill(purchaseStatus(p)) + '</span></div>'
+  ).join('') : '<p class="note">No book purchases.</p>';
+  const bookSub = mine.length
+    ? '<div class="kv"><span>Books total</span><span class="money">' +
+      fmtN(mine.reduce((s, p) => s + Number(p.paid || 0), 0)) + ' / ' +
+      fmtN(mine.reduce((s, p) => s + purchaseTotal(p), 0)) + '</span></div>'
+    : '';
+  const addBookBtn = '<div style="margin:10px 0 4px"><button type="button" class="btn btn-sm" data-action="pur-add-mate" data-id="' +
+    esc(m.id) + '">+ Add book for ' + esc(m.name) + '</button></div>';
+  const dueRows = levies.length ? levies.map((l) => {
+    const paid = duePaidFor(l.id, id);
+    return '<div class="kv"><span>' + esc(l.title) + '</span>' +
+      '<span><span class="money">' + fmtN(paid) + ' / ' + fmtN(l.amount) + '</span> ' + statusPill(levyStatusFor(l, id)) + '</span></div>';
+  }).join('') : '<p class="note">No levies set up yet.</p>';
+  $('detBody').innerHTML =
+    '<div class="kv"><span>Matric number</span><strong>' + esc(m.matric) + '</strong></div>' +
+    (m.phone ? '<div class="kv"><span>Phone</span><strong>' + esc(m.phone) + '</strong></div>' : '') +
+    '<div class="kv"><span>Total balance due</span><span class="money">' + fmtN(mateBalance(id)) + '</span></div>' +
+    '<div style="margin:10px 0 4px"><button type="button" class="btn btn-ghost btn-sm" data-action="receipt-open" data-id="' + esc(m.id) + '">Receipt / statement</button></div>' +
+    '<h2 style="margin-top:14px">Book purchases</h2>' + bookRows + bookSub + addBookBtn +
+    '<h2 style="margin-top:14px">Dues</h2>' + dueRows;
+  openDlg('dlgDetail');
+}
+
+/* ===== Receipts & reminders ===== */
+let receiptText = '';
+function openReceipt(id) {
+  const m = mateById(id);
+  if (!m) return;
+  receiptText = buildReceiptText(id);
+  const mine = purchases.filter((p) => p.mateId === id).slice()
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const bookPaid = mine.reduce((s, p) => s + Number(p.paid || 0), 0);
+  const bookTotal = mine.reduce((s, p) => s + purchaseTotal(p), 0);
+  const duePaid = levies.reduce((s, l) => s + duePaidFor(l.id, id), 0);
+  const dueTotal = levies.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const bookRows = mine.length ? mine.map((p) =>
+    '<div class="kv"><span>' + esc(p.bookTitle) + ' ×' + esc(p.qty) + ' <span class="note">' + esc(p.date) + '</span></span>' +
+    '<span><span class="money">' + fmtN(p.paid) + ' / ' + fmtN(purchaseTotal(p)) + '</span> ' + statusPill(purchaseStatus(p)) + '</span></div>'
+  ).join('') : '<p class="note">No books.</p>';
+  const dueRows = levies.length ? levies.map((l) => {
+    const paid = duePaidFor(l.id, id);
+    return '<div class="kv"><span>' + esc(l.title) + '</span>' +
+      '<span><span class="money">' + fmtN(paid) + ' / ' + fmtN(l.amount) + '</span> ' + statusPill(levyStatusFor(l, id)) + '</span></div>';
+  }).join('') : '<p class="note">No levies.</p>';
+  $('receiptBody').innerHTML =
+    '<h3>Payment statement</h3>' +
+    '<div class="kv"><span>Name</span><strong>' + esc(m.name) + '</strong></div>' +
+    '<div class="kv"><span>Matric</span><strong>' + esc(m.matric) + '</strong></div>' +
+    '<div class="kv"><span>Issued</span><span>' + esc(todayStr()) + '</span></div>' +
+    '<h2 style="margin-top:14px">Books</h2>' + bookRows +
+    '<div class="kv"><span>Books total</span><span class="money">' + fmtN(bookPaid) + ' / ' + fmtN(bookTotal) + '</span></div>' +
+    '<h2 style="margin-top:14px">Dues</h2>' + dueRows +
+    '<div class="kv"><span>Total paid</span><span class="money">' + fmtN(bookPaid + duePaid) + '</span></div>' +
+    '<div class="kv"><span>Balance due</span><span class="money">' + fmtN(Math.max(0, bookTotal - bookPaid) + Math.max(0, dueTotal - duePaid)) + '</span></div>';
+  showReceiptShare();
+  openDlg('dlgReceipt');
+}
+function buildReceiptText(id) {
+  const m = mateById(id);
+  if (!m) return '';
+  const mine = purchases.filter((p) => p.mateId === id).slice()
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const bookPaid = mine.reduce((s, p) => s + Number(p.paid || 0), 0);
+  const bookTotal = mine.reduce((s, p) => s + purchaseTotal(p), 0);
+  const duePaid = levies.reduce((s, l) => s + duePaidFor(l.id, id), 0);
+  const dueTotal = levies.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const L = [];
+  L.push('PAYMENT STATEMENT — Iwe');
+  L.push(m.name + ' (' + m.matric + ')');
+  L.push('Issued: ' + todayStr());
+  L.push('');
+  L.push('BOOKS:');
+  if (mine.length) mine.forEach((p) => L.push('- ' + p.bookTitle + ' x' + p.qty + ': ' + fmtN(p.paid) + ' / ' + fmtN(purchaseTotal(p)) + ' (' + STATUS_LABEL[purchaseStatus(p)] + ')'));
+  else L.push('(none)');
+  L.push('Books total: ' + fmtN(bookPaid) + ' / ' + fmtN(bookTotal));
+  L.push('');
+  L.push('DUES:');
+  if (levies.length) levies.forEach((l) => {
+    const paid = duePaidFor(l.id, id);
+    L.push('- ' + l.title + ': ' + fmtN(paid) + ' / ' + fmtN(l.amount) + ' (' + STATUS_LABEL[levyStatusFor(l, id)] + ')');
+  });
+  else L.push('(none)');
+  L.push('');
+  L.push('TOTAL PAID: ' + fmtN(bookPaid + duePaid));
+  L.push('BALANCE DUE: ' + fmtN(Math.max(0, bookTotal - bookPaid) + Math.max(0, dueTotal - duePaid)));
+  return L.join('\n');
+}
+function showReceiptShare() {
+  const sh = $('btnReceiptShare');
+  if (sh) sh.hidden = !(typeof navigator !== 'undefined' && navigator.share);
+}
+function openPurchaseReceipt(id) {
+  const p = purchases.find((x) => x.id === id);
+  if (!p) return;
+  const m = mateById(p.mateId);
+  receiptText = buildPurchaseReceiptText(id);
+  $('receiptBody').innerHTML =
+    '<h3>Book receipt</h3>' +
+    '<div class="kv"><span>Receipt no</span><strong>RC-' + esc(String(p.id).slice(-6).toUpperCase()) + '</strong></div>' +
+    '<div class="kv"><span>Buyer</span><strong>' + esc(m ? m.name : 'Unknown') + '</strong></div>' +
+    (m ? '<div class="kv"><span>Matric</span><span>' + esc(m.matric) + '</span></div>' : '') +
+    '<div class="kv"><span>Date</span><span>' + esc(p.date) + '</span></div>' +
+    '<div class="kv"><span>Book</span><span>' + esc(p.bookTitle) + ' ×' + esc(p.qty) + '</span></div>' +
+    '<div class="kv"><span>Unit price</span><span class="money">' + fmtN(p.unitPrice) + '</span></div>' +
+    '<div class="kv"><span>Total</span><span class="money">' + fmtN(purchaseTotal(p)) + '</span></div>' +
+    '<div class="kv"><span>Paid</span><span><span class="money">' + fmtN(p.paid) + '</span> ' + statusPill(purchaseStatus(p)) + '</span></div>' +
+    '<div class="kv"><span>Balance</span><span class="money">' + fmtN(Math.max(0, purchaseTotal(p) - Number(p.paid || 0))) + '</span></div>' +
+    (p.note ? '<div class="kv"><span>Note</span><span>' + esc(p.note) + '</span></div>' : '');
+  showReceiptShare();
+  openDlg('dlgReceipt');
+}
+function buildPurchaseReceiptText(id) {
+  const p = purchases.find((x) => x.id === id);
+  if (!p) return '';
+  const m = mateById(p.mateId);
+  return ['BOOK RECEIPT — Iwe',
+    'Receipt no: RC-' + String(p.id).slice(-6).toUpperCase(),
+    'Buyer: ' + (m ? m.name + ' (' + m.matric + ')' : 'Unknown'),
+    'Date: ' + p.date,
+    'Book: ' + p.bookTitle + ' x' + p.qty + ' @ ' + fmtN(p.unitPrice),
+    'Total: ' + fmtN(purchaseTotal(p)),
+    'Paid: ' + fmtN(p.paid) + ' (' + STATUS_LABEL[purchaseStatus(p)] + ')',
+    'Balance: ' + fmtN(Math.max(0, purchaseTotal(p) - Number(p.paid || 0)))
+  ].join('\n');
+}
+function openDueReceipt(levyId, mateId) {
+  const l = levyById(levyId);
+  const m = mateById(mateId);
+  if (!l || !m) return;
+  receiptText = buildDueReceiptText(levyId, mateId);
+  const payrecs = dues.filter((d) => d.levyId === levyId && d.mateId === mateId).slice()
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const paid = payrecs.reduce((s, d) => s + Number(d.paid || 0), 0);
+  const rows = payrecs.length ? payrecs.map((d) =>
+    '<div class="kv"><span>' + esc(d.date) + (d.note ? ' <span class="note">' + esc(d.note) + '</span>' : '') + '</span>' +
+    '<span class="money">' + fmtN(d.paid) + '</span></div>').join('') : '<p class="note">No payments yet.</p>';
+  $('receiptBody').innerHTML =
+    '<h3>Dues receipt</h3>' +
+    '<div class="kv"><span>Name</span><strong>' + esc(m.name) + '</strong></div>' +
+    '<div class="kv"><span>Matric</span><span>' + esc(m.matric) + '</span></div>' +
+    '<div class="kv"><span>Levy</span><strong>' + esc(l.title) + '</strong></div>' +
+    '<h2 style="margin-top:14px">Payments</h2>' + rows +
+    '<div class="kv"><span>Expected</span><span class="money">' + fmtN(l.amount) + '</span></div>' +
+    '<div class="kv"><span>Paid</span><span><span class="money">' + fmtN(paid) + '</span> ' + statusPill(levyStatusFor(l, mateId)) + '</span></div>' +
+    '<div class="kv"><span>Balance</span><span class="money">' + fmtN(Math.max(0, Number(l.amount || 0) - paid)) + '</span></div>';
+  showReceiptShare();
+  openDlg('dlgReceipt');
+}
+function buildDueReceiptText(levyId, mateId) {
+  const l = levyById(levyId);
+  const m = mateById(mateId);
+  if (!l || !m) return '';
+  const payrecs = dues.filter((d) => d.levyId === levyId && d.mateId === mateId).slice()
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const paid = payrecs.reduce((s, d) => s + Number(d.paid || 0), 0);
+  const L = ['DUES RECEIPT — Iwe',
+    m.name + ' (' + m.matric + ')',
+    'Levy: ' + l.title,
+    ''];
+  if (payrecs.length) payrecs.forEach((d) => L.push('- ' + d.date + ': ' + fmtN(d.paid)));
+  else L.push('(no payments yet)');
+  L.push('Expected: ' + fmtN(l.amount));
+  L.push('Paid: ' + fmtN(paid) + ' (' + STATUS_LABEL[levyStatusFor(l, mateId)] + ')');
+  L.push('Balance: ' + fmtN(Math.max(0, Number(l.amount || 0) - paid)));
+  return L.join('\n');
+}
+async function copyText(t) {
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(t);
+      return true;
+    }
+  } catch (e) { /* fall through */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = t;
+    document.body.appendChild(ta);
+    if (ta.select) ta.select();
+    const ok = document.execCommand ? document.execCommand('copy') : false;
+    ta.remove();
+    return !!ok;
+  } catch (e) { return false; }
+}
+function levyDebtors(levyId) {
+  const l = levyById(levyId);
+  if (!l) return [];
+  return mates
+    .map((m) => ({ m, bal: Math.max(0, Number(l.amount || 0) - duePaidFor(l.id, m.id)) }))
+    .filter((x) => x.bal > 0)
+    .sort((a, b) => String(a.m.name).localeCompare(String(b.m.name)));
+}
+function buildReminderText(levyId) {
+  const l = levyById(levyId);
+  if (!l) return '';
+  const owe = levyDebtors(levyId);
+  const L = [l.title + ' (' + fmtN(l.amount) + ' each, was due ' + (l.deadline || 'no deadline') + ')',
+    'Yet to pay (' + owe.length + '):'];
+  owe.forEach((o) => L.push('- ' + o.m.name + ' (' + o.m.matric + '): ' + fmtN(o.bal) + ' left'));
+  return L.join('\n');
+}
+function renderOverdue() {
+  const box = $('overList');
+  const t = todayStr();
+  const rows = levies
+    .filter((l) => l.deadline && l.deadline < t)
+    .map((l) => ({ l, owe: levyDebtors(l.id) }))
+    .filter((x) => x.owe.length);
+  box.innerHTML = rows.length ? rows.map((x) => {
+    const total = x.owe.reduce((s, o) => s + o.bal, 0);
+    return '<div class="row"><div class="grow"><div class="t">' + esc(x.l.title) + '</div>' +
+      '<div class="s">due ' + esc(x.l.deadline) + ' &middot; ' + x.owe.length + ' owing</div></div>' +
+      '<span class="money">' + fmtN(total) + '</span>' +
+      '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="levy-remind" data-id="' + esc(x.l.id) + '">Copy reminders</button></span></div>';
+  }).join('') : emptyRow('No overdue levies. Anything past its deadline with unpaid balances shows up here.');
+}
+
+/* ===== Click delegation ===== */
+async function onClick(e) {
+  const t = e && e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+  if (!t) return;
+  const a = t.dataset.action;
+  const id = t.dataset.id;
+  try {
+    if (a === 'tab') switchTab(t.dataset.tab);
+    else if (a === 'close') closeDlgFrom(t);
+    else if (a === 'about-open') openDlg('dlgAbout');
+    else if (a === 'mate-add') openMateDialog('');
+    else if (a === 'mate-edit') openMateDialog(id);
+    else if (a === 'mate-view') openMateDetail(id);
+    else if (a === 'book-add') openBookDialog('');
+    else if (a === 'book-edit') openBookDialog(id);
+    else if (a === 'book-del') {
+      const b = bookById(id);
+      if (b && confirm('Delete “' + b.title + '” from the catalog?')) await deleteBook(id);
+    }
+    else if (a === 'pur-add') openPurchaseDialog('');
+    else if (a === 'pur-add-mate') openPurchaseDialog('', id);
+    else if (a === 'pur-edit') openPurchaseDialog(id);
+    else if (a === 'pur-del') {
+      if (confirm('Delete this sale record?')) { await deletePurchase(id); toast('Sale deleted.'); }
+    }
+    else if (a === 'pur-toggle') {
+      const done = await toggleBought(id, !!(t && t.checked));
+      toast(done ? 'Marked as bought.' : 'Marked as not bought.');
+    }
+    else if (a === 'pline-del') {
+      const box = $('pLines');
+      const rows = box && box.querySelectorAll ? box.querySelectorAll('.pline') : [];
+      if (rows.length > 1 && t.closest) {
+        const row = t.closest('.pline');
+        if (row && row.remove) row.remove();
+      }
+      syncPurTotal();
+    }
+    else if (a === 'page') {
+      const parts = String(id || '').split(':');
+      turnPage(parts[0], parts[1]);
+    }
+    else if (a === 'levy-add') openLevyDialog('');
+    else if (a === 'levy-edit') openLevyDialog(id);
+    else if (a === 'levy-pick') { selectedLevy = id; renderDues(); }
+    else if (a === 'levy-del') {
+      const l = levyById(id);
+      if (l && confirm('Delete levy “' + l.title + '”?')) await deleteLevy(id);
+    }
+    else if (a === 'pay-add') openPayDialog(selectedLevy, '');
+    else if (a === 'pay-edit') {
+      const parts = String(id || '').split('|');
+      openPayDialog(parts[0], parts[1]);
+    }
+    else if (a === 'pur-receipt') openPurchaseReceipt(id);
+    else if (a === 'due-receipt') {
+      const parts = String(id || '').split('|');
+      openDueReceipt(parts[0], parts[1]);
+    }
+    else if (a === 'levy-remind') {
+      const ok = await copyText(buildReminderText(id));
+      toast(ok ? 'Reminders copied — paste into WhatsApp.' : 'Could not copy on this device.');
+    }
+    else if (a === 'receipt-open') openReceipt(id);
+  } catch (err) {
+    toast(err && err.message ? err.message : 'Something went wrong.');
+  }
+}
+/* ===== CSV import/export ===== */
+function csvCell(v) {
+  const s = String(v == null ? '' : v);
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function toCSV(header, rows) {
+  const lines = [header.map(csvCell).join(',')];
+  rows.forEach((r) => lines.push(r.map(csvCell).join(',')));
+  return '﻿' + lines.join('\r\n');
+}
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cur = '';
+  let q = false;
+  const t = String(text || '').replace(/^\uFEFF/, '');
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (q) {
+      if (c === '"') {
+        if (t[i + 1] === '"') { cur += '"'; i++; }
+        else q = false;
+      } else cur += c;
+    } else {
+      if (c === '"') q = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c === '\r') { /* skip */ }
+      else cur += c;
+    }
+  }
+  row.push(cur);
+  rows.push(row);
+  return rows.filter((r) => r.length > 1 || String(r[0] || '').trim() !== '');
+}
+function colIndex(header) {
+  const map = {};
+  header.forEach((h, i) => { map[norm(h)] = i; });
+  return (row, names) => {
+    for (let k = 0; k < names.length; k++) {
+      const i = map[norm(names[k])];
+      if (i !== undefined && row[i] !== undefined) return String(row[i]).trim();
+    }
+    return '';
+  };
+}
+function downloadFile(name, text, type) {
+  const blob = new Blob([text], { type: type || 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    try { URL.revokeObjectURL(a.href); } catch (e) { /* ignore */ }
+    a.remove();
+  }, 500);
+}
+const stamp = () => todayStr();
+
+function exportMates() {
+  if (!mates.length) { toast('Nothing to export yet.'); return; }
+  downloadFile('coursemates-' + stamp() + '.csv', toCSV(
+    ['name', 'matric', 'phone'],
+    mates.map((m) => [m.name, m.matric, m.phone || ''])
+  ), 'text/csv;charset=utf-8');
+}
+function exportBooks() {
+  if (!books.length) { toast('Nothing to export yet.'); return; }
+  downloadFile('book-catalog-' + stamp() + '.csv', toCSV(
+    ['title', 'price'],
+    books.map((b) => [b.title, b.price])
+  ), 'text/csv;charset=utf-8');
+}
+function exportPurchases() {
+  if (!purchases.length) { toast('Nothing to export yet.'); return; }
+  downloadFile('book-purchases-' + stamp() + '.csv', toCSV(
+    ['date', 'name', 'matric', 'book', 'qty', 'unitPrice', 'total', 'paid', 'balance', 'status', 'bought', 'note'],
+    purchases.map((p) => {
+      const m = mateById(p.mateId);
+      return [p.date, m ? m.name : '', m ? m.matric : '', p.bookTitle, p.qty,
+        p.unitPrice, purchaseTotal(p), p.paid, purchaseTotal(p) - Number(p.paid || 0),
+        STATUS_LABEL[purchaseStatus(p)], purchaseStatus(p) === 'paid' ? 'yes' : 'no', p.note || ''];
+    })
+  ), 'text/csv;charset=utf-8');
+}
+function exportLevies() {
+  if (!levies.length) { toast('Nothing to export yet.'); return; }
+  downloadFile('levies-' + stamp() + '.csv', toCSV(
+    ['title', 'amount', 'deadline'],
+    levies.map((l) => [l.title, l.amount, l.deadline || ''])
+  ), 'text/csv;charset=utf-8');
+}
+function exportPayments() {
+  if (!dues.length) { toast('Nothing to export yet.'); return; }
+  downloadFile('dues-payments-' + stamp() + '.csv', toCSV(
+    ['date', 'name', 'matric', 'levy', 'paid', 'note'],
+    dues.map((d) => {
+      const m = mateById(d.mateId);
+      return [d.date, m ? m.name : '', m ? m.matric : '', d.levyTitle, d.paid, d.note || ''];
+    })
+  ), 'text/csv;charset=utf-8');
+}
+function exportBackup() {
+  downloadFile('book-manager-backup-' + stamp() + '.json', JSON.stringify({
+    app: 'book-manager', version: 1, exportedAt: new Date().toISOString(),
+    mates, books, purchases, levies, dues
+  }, null, 2), 'application/json');
+}
+
+async function importMates(rows) {
+  if (!rows.length) return { added: 0, updated: 0 };
+  const get = colIndex(rows[0]);
+  let added = 0, updated = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const name = get(rows[i], ['name', 'fullname', 'full name']);
+    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'matric number', 'id']);
+    const phone = get(rows[i], ['phone', 'tel', 'telephone', 'number']);
+    if (!name || !matric) continue;
+    const ex = mateByMatric(matric);
+    await saveMateSilent({ id: ex ? ex.id : '', name, matric, phone });
+    if (ex) updated++; else added++;
+  }
+  renderAll();
+  return { added, updated };
+}
+async function saveMateSilent(d) {
+  const row = {
+    id: d.id || uid(),
+    name: String(d.name || '').trim(),
+    matric: String(d.matric || '').trim(),
+    phone: String(d.phone || '').trim()
+  };
+  await dbPut('mates', row);
+  const i = mates.findIndex((m) => m.id === row.id);
+  if (i === -1) mates.push(row); else mates[i] = row;
+  return row;
+}
+async function importBooks(rows) {
+  if (!rows.length) return { added: 0, updated: 0 };
+  const get = colIndex(rows[0]);
+  let added = 0, updated = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const title = get(rows[i], ['title', 'book', 'name']);
+    const price = Number(get(rows[i], ['price', 'amount', 'cost']) || 0);
+    if (!title) continue;
+    const ex = bookByTitle(title);
+    const row = { id: ex ? ex.id : uid(), title, price: Math.max(0, price) };
+    await dbPut('books', row);
+    const j = books.findIndex((b) => b.id === row.id);
+    if (j === -1) books.push(row); else books[j] = row;
+    if (ex) updated++; else added++;
+  }
+  renderAll();
+  return { added, updated };
+}
+async function importLevies(rows) {
+  if (!rows.length) return { added: 0, updated: 0 };
+  const get = colIndex(rows[0]);
+  let added = 0, updated = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const title = get(rows[i], ['title', 'levy', 'name', 'due']);
+    const amount = Number(get(rows[i], ['amount', 'price']) || 0);
+    const deadline = get(rows[i], ['deadline', 'due date', 'date']);
+    if (!title) continue;
+    const ex = levyByTitle(title);
+    const row = { id: ex ? ex.id : uid(), title, amount: Math.max(0, amount), deadline };
+    await dbPut('levies', row);
+    const j = levies.findIndex((l) => l.id === row.id);
+    if (j === -1) { levies.push(row); } else levies[j] = row;
+    if (ex) updated++; else added++;
+  }
+  if (!levyById(selectedLevy) && levies.length) selectedLevy = levies[0].id;
+  renderAll();
+  return { added, updated };
+}
+async function importPurchases(rows) {
+  if (!rows.length) return { added: 0, skipped: 0 };
+  const get = colIndex(rows[0]);
+  let added = 0, skipped = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'id']);
+    const title = get(rows[i], ['book', 'title', 'name']);
+    const m = matric ? mateByMatric(matric) : null;
+    const b = title ? bookByTitle(title) : null;
+    if (!m || !b) { skipped++; continue; }
+    const unit = Number(get(rows[i], ['unitprice', 'unit price', 'price']) || b.price || 0);
+    const qty = Math.max(1, parseInt(get(rows[i], ['qty', 'quantity']) || '1', 10) || 1);
+    let payAmt = Math.max(0, Number(get(rows[i], ['paid', 'amount']) || 0));
+    const boughtYes = ['yes', 'true', '1', 'y'].indexOf(norm(get(rows[i], ['bought']))) !== -1;
+    if (boughtYes && payAmt <= 0) payAmt = unit * qty;
+    const row = {
+      id: uid(), mateId: m.id, bookId: b.id, bookTitle: b.title,
+      unitPrice: unit, qty, paid: payAmt,
+      date: get(rows[i], ['date']) || todayStr(),
+      note: get(rows[i], ['note', 'notes', 'comment'])
+    };
+    await dbPut('purchases', row);
+    purchases.push(row);
+    added++;
+  }
+  renderAll();
+  return { added, skipped };
+}
+async function importPayments(rows) {
+  if (!rows.length) return { added: 0, skipped: 0 };
+  const get = colIndex(rows[0]);
+  let added = 0, skipped = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'id']);
+    const title = get(rows[i], ['levy', 'title', 'due', 'name']);
+    const m = matric ? mateByMatric(matric) : null;
+    const l = title ? levyByTitle(title) : null;
+    if (!m || !l) { skipped++; continue; }
+    const row = {
+      id: uid(), levyId: l.id, levyTitle: l.title, mateId: m.id,
+      paid: Math.max(0, Number(get(rows[i], ['paid', 'amount']) || 0)),
+      date: get(rows[i], ['date']) || todayStr(),
+      note: get(rows[i], ['note', 'notes', 'comment'])
+    };
+    await dbPut('dues', row);
+    dues.push(row);
+    added++;
+  }
+  renderAll();
+  return { added, skipped };
+}
+async function importBackup(obj) {
+  if (!obj || obj.app !== 'book-manager' || !Array.isArray(obj.mates)) {
+    throw new Error('That file is not a Book Manager backup.');
+  }
+  const lists = {
+    mates: obj.mates || [], books: obj.books || [], purchases: obj.purchases || [],
+    levies: obj.levies || [], dues: obj.dues || []
+  };
+  for (const n of STORE_NAMES) {
+    await dbClear(n);
+    for (const r of lists[n]) {
+      if (r && r.id) await dbPut(n, r);
+    }
+  }
+  await loadAll();
+  if (!levyById(selectedLevy)) selectedLevy = levies.length ? levies[0].id : '';
+  renderAll();
+}
+function wireFileInput(inputId, onText) {
+  const inp = $(inputId);
+  if (!inp) return;
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0];
+    inp.value = '';
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = async () => {
+      try {
+        const msg = await onText(String(rd.result || ''));
+        toast(msg);
+      } catch (err) {
+        toast(err && err.message ? err.message : 'Import failed.');
+      }
+    };
+    rd.onerror = () => toast('Could not read that file.');
+    rd.readAsText(f);
+  });
+}
+
+/* ===== Sample data ===== */
+async function loadSampleData() {
+  const T = todayStr();
+  const seedMates = [
+    ['Adaeze Okafor', 'SCI/2023/001', '0803 111 0001'],
+    ['Tunde Bakare', 'SCI/2023/002', '0803 111 0002'],
+    ['Fatima Musa', 'SCI/2023/003', '0803 111 0003'],
+    ['Emeka Nwosu', 'SCI/2023/004', '0803 111 0004'],
+    ['Blessing Adeyemi', 'SCI/2023/005', '0803 111 0005'],
+    ['Ibrahim Danladi', 'SCI/2023/006', '0803 111 0006'],
+    ['Ngozi Eze', 'SCI/2023/007', '0803 111 0007'],
+    ['Seun Ogunleye', 'SCI/2023/008', '0803 111 0008']
+  ];
+  const mIds = {};
+  for (const s of seedMates) {
+    const ex = mateByMatric(s[1]);
+    if (ex) { mIds[s[1]] = ex.id; continue; }
+    const row = { id: uid(), name: s[0], matric: s[1], phone: s[2] };
+    await dbPut('mates', row);
+    mates.push(row);
+    mIds[s[1]] = row.id;
+  }
+  const seedBooks = [
+    ['Engineering Mathematics II', 4500],
+    ['Use of English', 2800],
+    ['Physics Practical Manual', 3200]
+  ];
+  const bIds = {};
+  for (const s of seedBooks) {
+    const ex = bookByTitle(s[0]);
+    if (ex) { bIds[s[0]] = ex.id; continue; }
+    const row = { id: uid(), title: s[0], price: s[1] };
+    await dbPut('books', row);
+    books.push(row);
+    bIds[s[0]] = row.id;
+  }
+  const seedLevies = [
+    ['Departmental Dues 2025/2026', 2000, ''],
+    ['Freshers’ Welcome Levy', 1500, datePlus(-30)]
+  ];
+  const lIds = {};
+  for (const s of seedLevies) {
+    const ex = levyByTitle(s[0]);
+    if (ex) { lIds[s[0]] = ex.id; continue; }
+    const row = { id: uid(), title: s[0], amount: s[1], deadline: s[2] };
+    await dbPut('levies', row);
+    levies.push(row);
+    lIds[s[0]] = row.id;
+  }
+  const b1 = bookById(bIds['Engineering Mathematics II']);
+  const b2 = bookById(bIds['Use of English']);
+  const seedPur = [
+    ['SCI/2023/001', b1, 1, 4500], ['SCI/2023/002', b1, 1, 2000], ['SCI/2023/003', b2, 1, 2800],
+    ['SCI/2023/004', b1, 1, 0], ['SCI/2023/005', b2, 2, 5600]
+  ];
+  for (const s of seedPur) {
+    const row = {
+      id: uid(), mateId: mIds[s[0]], bookId: s[1].id, bookTitle: s[1].title,
+      unitPrice: s[1].price, qty: s[2], paid: s[3], date: T, note: 'sample'
+    };
+    await dbPut('purchases', row);
+    purchases.push(row);
+  }
+  const l1 = levyById(lIds['Departmental Dues 2025/2026']);
+  const seedDues = [
+    ['SCI/2023/001', l1, 2000], ['SCI/2023/002', l1, 1000], ['SCI/2023/003', l1, 2000]
+  ];
+  for (const s of seedDues) {
+    const row = { id: uid(), levyId: s[1].id, levyTitle: s[1].title, mateId: mIds[s[0]], paid: s[2], date: T, note: 'sample' };
+    await dbPut('dues', row);
+    dues.push(row);
+  }
+  if (!levyById(selectedLevy) && levies.length) selectedLevy = levies[0].id;
+  renderAll();
+}
+
+/* ===== Multi-book sale lines ===== */
+function bookOptions(sel) {
+  return books.map((b) => '<option value="' + esc(b.id) + '"' + (b.id === sel ? ' selected' : '') +
+    '>' + esc(b.title) + ' — ' + fmtN(b.price) + '</option>').join('');
+}
+function addPurLine(bookId, qty) {
+  const box = $('pLines');
+  const div = document.createElement('div');
+  div.className = 'pline';
+  div.innerHTML = '<select class="pline-book" required aria-label="Book">' +
+    bookOptions(bookId || (books.length ? books[0].id : '')) + '</select>' +
+    '<input type="number" class="pline-qty" min="1" step="1" value="' + (qty || 1) + '" required aria-label="Quantity">' +
+    '<button type="button" class="btn btn-danger btn-sm pline-del" data-action="pline-del" aria-label="Remove this book">×</button>';
+  box.appendChild(div);
+  syncPurTotal();
+}
+function purLines() {
+  const out = [];
+  const box = $('pLines');
+  const divs = box.querySelectorAll ? box.querySelectorAll('.pline') : [];
+  for (let i = 0; i < divs.length; i++) {
+    const b = divs[i].querySelector('.pline-book');
+    const q = divs[i].querySelector('.pline-qty');
+    out.push({ bookId: b ? b.value : '', qty: Math.max(1, parseInt(q ? q.value : '1', 10) || 1) });
+  }
+  return out;
+}
+function purLinesTotal() {
+  return purLines().reduce((s, l) => {
+    const b = bookById(l.bookId);
+    return s + (b ? Number(b.price || 0) * l.qty : 0);
+  }, 0);
+}
+function syncPurPaid() {
+  if (!$('pBought') || !$('pBought').checked) return;
+  $('pPaid').value = purLinesTotal();
+}
+function syncPurTotal() {
+  const h = $('pTotalHint');
+  if (h) h.textContent = 'Total: ' + fmtN(purLinesTotal());
+  syncPurPaid();
+}
+
+/* ===== Form wiring ===== */
+let purAnother = false;
+function wireForms() {
+  $('formMate').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await saveMate({ id: $('mId').value, name: $('mName').value, matric: $('mMatric').value, phone: $('mPhone').value });
+      closeDlgFrom($('formMate'));
+      toast('Coursemate saved.');
+    } catch (err) { toast(err.message); }
+  });
+  $('formBook').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await saveBook({ id: $('bId').value, title: $('bTitle').value, price: $('bPrice').value });
+      closeDlgFrom($('formBook'));
+      toast('Book saved.');
+    } catch (err) { toast(err.message); }
+  });
+  $('formPur').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      const editId = $('pId').value;
+      if (editId) {
+        const line = purLines()[0] || {};
+        const saved = await savePurchase({
+          id: editId, bookId: line.bookId, mateText: $('pMate').value,
+          qty: line.qty, paid: $('pPaid').value, bought: $('pBought').checked,
+          date: $('pDate').value, note: $('pNote').value
+        });
+        refreshDetail(saved.mateId);
+        purAnother = false;
+        closeDlgFrom($('formPur'));
+        toast('Sale updated.');
+        return;
+      }
+      const lines = purLines().filter((l) => l.bookId);
+      if (!lines.length) throw new Error('Add at least one book.');
+      const mate = resolveMate($('pMate').value);
+      if (!mate) throw new Error('Pick a coursemate from the list (type name or matric).');
+      const items = lines.map((l) => ({ book: bookById(l.bookId), qty: l.qty })).filter((x) => x.book);
+      if (!items.length) throw new Error('Choose a book from the catalog.');
+      const total = items.reduce((s, x) => s + Number(x.book.price || 0) * x.qty, 0);
+      const paidTotal = $('pBought').checked ? total : Math.max(0, Number($('pPaid').value || 0));
+      await addPurchases(mate, items, { paidTotal, date: $('pDate').value, note: $('pNote').value });
+      refreshDetail(mate.id);
+      if (purAnother) {
+        purAnother = false;
+        $('pLines').innerHTML = '';
+        addPurLine('', 1);
+        $('pPaid').value = 0;
+        $('pNote').value = '';
+        $('pBought').checked = false;
+        syncPurTotal();
+        toast('Saved — add the next book.');
+      } else {
+        closeDlgFrom($('formPur'));
+        toast(items.length > 1 ? items.length + ' books recorded.' : 'Sale recorded.');
+      }
+    } catch (err) { purAnother = false; toast(err.message); }
+  });
+  $('formLevy').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await saveLevy({ id: $('lId').value, title: $('lTitle').value, amount: $('lAmount').value, deadline: $('lDeadline').value });
+      closeDlgFrom($('formLevy'));
+      toast('Levy saved.');
+    } catch (err) { toast(err.message); }
+  });
+  $('formPay').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await saveDuePayment({
+        levyId: $('payLevy').value, mateText: $('payMate').value,
+        paid: $('payAmt').value, date: $('payDate').value, note: $('payNote').value
+      });
+      closeDlgFrom($('formPay'));
+      toast('Payment recorded.');
+    } catch (err) { toast(err.message); }
+  });
+  const ms = $('mateSearch');
+  if (ms) ms.addEventListener('input', () => { pages.mates = 1; renderMates(); });
+  const pf = $('purFilter');
+  if (pf) pf.addEventListener('change', () => { pages.pur = 1; renderBooks(); });
+  const df = $('dueFilter');
+  if (df) df.addEventListener('change', () => { pages.due = 1; renderDues(); });
+  const ls = $('levySel');
+  if (ls) ls.addEventListener('change', () => { selectedLevy = ls.value; pages.due = 1; renderDues(); });
+  const pl = $('payLevy');
+  if (pl) pl.addEventListener('change', () => {
+    const m = resolveMate($('payMate').value);
+    const lv = levyById(pl.value);
+    if (lv && m) $('payAmt').value = Math.max(0, Number(lv.amount || 0) - duePaidFor(lv.id, m.id));
+  });
+
+  $('pBought').addEventListener('change', syncPurPaid);
+  const plBox = $('pLines');
+  if (plBox) {
+    plBox.addEventListener('change', syncPurTotal);
+    plBox.addEventListener('input', syncPurTotal);
+  }
+  const alBtn = $('btnAddLine');
+  if (alBtn) alBtn.addEventListener('click', () => { addPurLine('', 1); });
+  const pa = $('btnPurAnother');
+  if (pa) pa.addEventListener('click', () => {
+    purAnother = true;
+    const f = $('formPur');
+    if (f && f.requestSubmit) f.requestSubmit();
+  });
+
+  $('btnExportAll').addEventListener('click', exportBackup);
+  $('btnImportAll').addEventListener('click', () => $('fileBackup').click());
+  $('btnWipe').addEventListener('click', async () => {
+    if (!confirm('Erase ALL coursemates, books, sales, levies and payments on this device? This cannot be undone.')) return;
+    for (const n of STORE_NAMES) await dbClear(n);
+    await loadAll();
+    selectedLevy = '';
+    renderAll();
+    toast('All data erased.');
+  });
+  $('btnExpMates').addEventListener('click', exportMates);
+  $('btnImpMates').addEventListener('click', () => $('fileMates').click());
+  $('btnExpBooks').addEventListener('click', exportBooks);
+  $('btnImpBooks').addEventListener('click', () => $('fileBooks').click());
+  $('btnExpPur').addEventListener('click', exportPurchases);
+  $('btnImpPur').addEventListener('click', () => $('filePur').click());
+  $('btnExpLev').addEventListener('click', exportLevies);
+  $('btnImpLev').addEventListener('click', () => $('fileLev').click());
+  $('btnExpPay').addEventListener('click', exportPayments);
+  $('btnImpPay').addEventListener('click', () => $('filePay').click());
+  $('btnReceiptPrint').addEventListener('click', () => {
+    try { if (typeof window !== 'undefined' && window.print) window.print(); } catch (e) { /* ignore */ }
+  });
+  $('btnReceiptCopy').addEventListener('click', async () => {
+    const ok = await copyText(receiptText);
+    toast(ok ? 'Statement copied — paste into WhatsApp.' : 'Could not copy on this device.');
+  });
+  $('btnReceiptShare').addEventListener('click', async () => {
+    try {
+      await navigator.share({ title: 'Receipt', text: receiptText });
+      toast('Shared.');
+    } catch (e) { /* user cancelled or unsupported */ }
+  });
+
+  wireFileInput('fileMates', async (t) => {
+    const r = await importMates(parseCSV(t));
+    return 'Imported coursemates: ' + r.added + ' added, ' + r.updated + ' updated.';
+  });
+  wireFileInput('fileBooks', async (t) => {
+    const r = await importBooks(parseCSV(t));
+    return 'Imported books: ' + r.added + ' added, ' + r.updated + ' updated.';
+  });
+  wireFileInput('filePur', async (t) => {
+    const r = await importPurchases(parseCSV(t));
+    return 'Imported sales: ' + r.added + ' added, ' + r.skipped + ' skipped (unknown matric or book).';
+  });
+  wireFileInput('fileLev', async (t) => {
+    const r = await importLevies(parseCSV(t));
+    return 'Imported levies: ' + r.added + ' added, ' + r.updated + ' updated.';
+  });
+  wireFileInput('filePay', async (t) => {
+    const r = await importPayments(parseCSV(t));
+    return 'Imported payments: ' + r.added + ' added, ' + r.skipped + ' skipped (unknown matric or levy).';
+  });
+  wireFileInput('fileBackup', async (t) => {
+    let obj;
+    try { obj = JSON.parse(t); } catch (e) { throw new Error('That file is not valid JSON.'); }
+    if (!confirm('Replace everything on this device with this backup?')) return 'Import cancelled.';
+    await importBackup(obj);
+    return 'Backup restored.';
+  });
+}
+
+/* ===== Init ===== */
+let inited = false;
+async function init() {
+  if (inited) return;
+  inited = true;
+  try {
+    if (hasIdb()) db = await openDb();
+    else memMode = true;
+  } catch (e) {
+    memMode = true;
+    db = null;
+  }
+  await loadAll();
+  document.addEventListener('click', onClick);
+  wireForms();
+  let start = 'home';
+  try {
+    const h = (typeof location !== 'undefined' && location && location.hash) ? String(location.hash).replace('#', '') : '';
+    if (h) start = h;
+  } catch (e) { /* ignore */ }
+  renderAll();
+  switchTab(start);
+}
+
+let readyPromise = null;
+function startInit() {
+  if (!readyPromise) readyPromise = init();
+  return readyPromise;
+}
+if (typeof document !== 'undefined' && document.addEventListener) {
+  document.addEventListener('DOMContentLoaded', () => { startInit(); });
+  if (document.readyState !== 'loading') startInit();
+}
+const ready = startInit();
+
+/* Exposed for smoke tests and debugging */
+if (typeof window !== 'undefined') {
+  window.App = {
+    ready,
+    renderAll,
+    getState: () => ({ mates, books, purchases, levies, dues, memMode }),
+    actions: { saveMate, deleteMate, saveBook, deleteBook, savePurchase, addPurchases, deletePurchase, toggleBought, turnPage, openMateDetail, saveLevy, deleteLevy, saveDuePayment, loadSampleData, importBackup, importMates, importBooks, importLevies, importPurchases, importPayments, openReceipt, buildReceiptText, openPurchaseReceipt, buildPurchaseReceiptText, openDueReceipt, buildDueReceiptText, buildReminderText },
+    helpers: { parseCSV, toCSV, fmtN, purchaseStatus, levyStatusFor, mateBalance }
+  };
+}
+</script>
+</body>
+</html>
