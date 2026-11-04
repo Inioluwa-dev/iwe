@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Iwe: book collections and dues tracking for class reps. Works offline.">
-<title>Iwe — Book Collections &amp; Dues</title>
+<meta name="description" content="Iwé: book collections and dues tracking for class reps. Works offline.">
+<title>Iwé — Book Collections &amp; Dues</title>
 <style>
 :root{
   --bg:#f3ecdc; --card:#fffdf6; --ink:#2b2320; --muted:#7a6f5c; --line:#ddd2b8;
@@ -12,7 +12,7 @@
   --amber-bg:#fbf0d3; --green-bg:#e4efe3; --red-bg:#fbe9e7;
   --brand-deep:#6e2430; --row-line:#eadfc3;
   --shadow:0 1px 2px rgba(60,40,40,.07),0 6px 18px rgba(60,40,40,.06);
-}
+} 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -101,6 +101,9 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
 .pline{display:flex;gap:6px;margin-bottom:8px}
 .pline select{flex:1;min-width:0}
 .pline input{width:64px;flex-shrink:0}
+/* File inputs stay rendered (but invisible) so mobile browsers reliably
+   open the file picker when the visible Import button is tapped. */
+input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opacity:0;overflow:hidden;pointer-events:none;border:0}
 @media print{
   header.app,main.wrap,nav.tabs,#toast,.dlg-actions{display:none!important}
   body{background:#fff}
@@ -115,7 +118,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
 <header class="app">
   <div class="wrap head-in">
     <div>
-      <h1>Iwe</h1>
+      <h1>Iwé</h1>
       <p class="sub">Book collections &amp; dues &middot; works offline on this device</p>
     </div>
     <button type="button" class="btn btn-light btn-sm" data-action="about-open">About</button>
@@ -145,7 +148,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
         <button type="button" class="btn btn-ghost btn-sm" id="btnImportAll">Import backup</button>
         <button type="button" class="btn btn-danger btn-sm" id="btnWipe">Erase everything</button>
       </div>
-      <input type="file" id="fileBackup" accept="application/json,.json" hidden>
+      <input type="file" id="fileBackup" class="file-hidden" tabindex="-1" aria-hidden="true" accept="application/json,.json">
     </div>
 
     <footer class="credit">Built by <strong>Inioluwa Olayoriju</strong> &middot; <a href="tel:+2349133770970">+234 9133770970</a></footer>
@@ -160,7 +163,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
       <input type="search" class="search" id="mateSearch" placeholder="Search name or matric no…" aria-label="Search coursemates">
       <button type="button" class="btn btn-ghost btn-sm" id="btnExpMates">Export CSV</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnImpMates">Import CSV</button>
-      <input type="file" id="fileMates" accept=".csv,text/csv" hidden>
+      <input type="file" id="fileMates" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <p class="note">Add all coursemates once, then tap a name anywhere to record a book sale or dues payment.</p>
     <div class="list" id="mateList"></div>
@@ -174,7 +177,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
     <div class="toolbar">
       <button type="button" class="btn btn-ghost btn-sm" id="btnExpBooks">Export catalog</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnImpBooks">Import catalog</button>
-      <input type="file" id="fileBooks" accept=".csv,text/csv" hidden>
+      <input type="file" id="fileBooks" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="bookList"></div>
 
@@ -191,7 +194,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
       </select>
       <button type="button" class="btn btn-ghost btn-sm" id="btnExpPur">Export CSV</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnImpPur">Import CSV</button>
-      <input type="file" id="filePur" accept=".csv,text/csv" hidden>
+      <input type="file" id="filePur" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="purList"></div>
   </section>
@@ -204,7 +207,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
     <div class="toolbar">
       <button type="button" class="btn btn-ghost btn-sm" id="btnExpLev">Export levies</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnImpLev">Import levies</button>
-      <input type="file" id="fileLev" accept=".csv,text/csv" hidden>
+      <input type="file" id="fileLev" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="levyList"></div>
 
@@ -223,7 +226,7 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
     <div class="toolbar">
       <button type="button" class="btn btn-ghost btn-sm" id="btnExpPay">Export payments</button>
       <button type="button" class="btn btn-ghost btn-sm" id="btnImpPay">Import payments</button>
-      <input type="file" id="filePay" accept=".csv,text/csv" hidden>
+      <input type="file" id="filePay" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="dueList"></div>
 
@@ -597,7 +600,8 @@ function renderMates() {
       right +
       '<span class="btns"><button type="button" class="btn btn-ghost btn-sm" data-action="mate-view" data-id="' + esc(m.id) + '">View</button>' +
       '<button type="button" class="btn btn-ghost btn-sm" data-action="receipt-open" data-id="' + esc(m.id) + '">Receipt</button>' +
-      '<button type="button" class="btn btn-ghost btn-sm" data-action="mate-edit" data-id="' + esc(m.id) + '">Edit</button></span></div>';
+      '<button type="button" class="btn btn-ghost btn-sm" data-action="mate-edit" data-id="' + esc(m.id) + '">Edit</button>' +
+      '<button type="button" class="btn btn-danger btn-sm" data-action="mate-del" data-id="' + esc(m.id) + '">Del</button></span></div>';
   }).join('') + pagerHTML('mates', list.length) : emptyRow(mates.length ? 'No coursemates match this search.' : 'No coursemates yet. Add your coursemates to begin.');
   $('dlMates').innerHTML = mates.map((m) =>
     '<option value="' + esc(m.matric + ' · ' + m.name) + '">').join('');
@@ -866,6 +870,12 @@ function closeDlgFrom(el) {
   const d = el && el.closest ? el.closest('dialog') : null;
   if (d && d.close) { try { d.close(); } catch (e) { /* ignore */ } }
 }
+function closeDetail() {
+  try {
+    const dd = $('dlgDetail');
+    if (dd && dd.open && dd.close) dd.close();
+  } catch (e) { /* ignore */ }
+}
 function openMateDialog(id) {
   const m = id ? mateById(id) : null;
   $('mateDlgTitle').textContent = m ? 'Edit coursemate' : 'Add coursemate';
@@ -951,7 +961,8 @@ function openMateDetail(id) {
     '<div class="kv"><span>Matric number</span><strong>' + esc(m.matric) + '</strong></div>' +
     (m.phone ? '<div class="kv"><span>Phone</span><strong>' + esc(m.phone) + '</strong></div>' : '') +
     '<div class="kv"><span>Total balance due</span><span class="money">' + fmtN(mateBalance(id)) + '</span></div>' +
-    '<div style="margin:10px 0 4px"><button type="button" class="btn btn-ghost btn-sm" data-action="receipt-open" data-id="' + esc(m.id) + '">Receipt / statement</button></div>' +
+    '<div style="margin:10px 0 4px"><button type="button" class="btn btn-ghost btn-sm" data-action="receipt-open" data-id="' + esc(m.id) + '">Receipt / statement</button> ' +
+    '<button type="button" class="btn btn-danger btn-sm" data-action="mate-del" data-id="' + esc(m.id) + '">Delete coursemate</button></div>' +
     '<h2 style="margin-top:14px">Book purchases</h2>' + bookRows + bookSub + addBookBtn +
     '<h2 style="margin-top:14px">Dues</h2>' + dueRows;
   openDlg('dlgDetail');
@@ -962,6 +973,7 @@ let receiptText = '';
 function openReceipt(id) {
   const m = mateById(id);
   if (!m) return;
+  closeDetail();
   receiptText = buildReceiptText(id);
   const mine = purchases.filter((p) => p.mateId === id).slice()
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -1001,7 +1013,7 @@ function buildReceiptText(id) {
   const duePaid = levies.reduce((s, l) => s + duePaidFor(l.id, id), 0);
   const dueTotal = levies.reduce((s, l) => s + Number(l.amount || 0), 0);
   const L = [];
-  L.push('PAYMENT STATEMENT — Iwe');
+  L.push('PAYMENT STATEMENT — Iwé');
   L.push(m.name + ' (' + m.matric + ')');
   L.push('Issued: ' + todayStr());
   L.push('');
@@ -1028,6 +1040,7 @@ function showReceiptShare() {
 function openPurchaseReceipt(id) {
   const p = purchases.find((x) => x.id === id);
   if (!p) return;
+  closeDetail();
   const m = mateById(p.mateId);
   receiptText = buildPurchaseReceiptText(id);
   $('receiptBody').innerHTML =
@@ -1049,7 +1062,7 @@ function buildPurchaseReceiptText(id) {
   const p = purchases.find((x) => x.id === id);
   if (!p) return '';
   const m = mateById(p.mateId);
-  return ['BOOK RECEIPT — Iwe',
+  return ['BOOK RECEIPT — Iwé',
     'Receipt no: RC-' + String(p.id).slice(-6).toUpperCase(),
     'Buyer: ' + (m ? m.name + ' (' + m.matric + ')' : 'Unknown'),
     'Date: ' + p.date,
@@ -1063,6 +1076,7 @@ function openDueReceipt(levyId, mateId) {
   const l = levyById(levyId);
   const m = mateById(mateId);
   if (!l || !m) return;
+  closeDetail();
   receiptText = buildDueReceiptText(levyId, mateId);
   const payrecs = dues.filter((d) => d.levyId === levyId && d.mateId === mateId).slice()
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -1089,7 +1103,7 @@ function buildDueReceiptText(levyId, mateId) {
   const payrecs = dues.filter((d) => d.levyId === levyId && d.mateId === mateId).slice()
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
   const paid = payrecs.reduce((s, d) => s + Number(d.paid || 0), 0);
-  const L = ['DUES RECEIPT — Iwe',
+  const L = ['DUES RECEIPT — Iwé',
     m.name + ' (' + m.matric + ')',
     'Levy: ' + l.title,
     ''];
@@ -1163,11 +1177,32 @@ async function onClick(e) {
     else if (a === 'mate-add') openMateDialog('');
     else if (a === 'mate-edit') openMateDialog(id);
     else if (a === 'mate-view') openMateDetail(id);
+    else if (a === 'mate-del') {
+      const mm = mateById(id);
+      if (!mm) return;
+      const ns = purchases.filter((p) => p.mateId === id).length;
+      const nd = dues.filter((d) => d.mateId === id).length;
+      let extra = '';
+      if (ns || nd) extra = ' This also removes ' + ns + ' sale(s) and ' + nd + ' payment(s).';
+      if (confirm('Delete ' + mm.name + ' (' + mm.matric + ')?' + extra)) {
+        await deleteMate(id);
+        closeDetail();
+        toast('Coursemate deleted.');
+      }
+    }
     else if (a === 'book-add') openBookDialog('');
     else if (a === 'book-edit') openBookDialog(id);
     else if (a === 'book-del') {
       const b = bookById(id);
-      if (b && confirm('Delete “' + b.title + '” from the catalog?')) await deleteBook(id);
+      if (!b) return;
+      if (purchases.some((p) => p.bookId === id)) {
+        toast('This book has recorded sales, so it cannot be deleted. Edit it instead.');
+        return;
+      }
+      if (confirm('Delete “' + b.title + '” from the catalog?')) {
+        await deleteBook(id);
+        toast('Book deleted.');
+      }
     }
     else if (a === 'pur-add') openPurchaseDialog('');
     else if (a === 'pur-add-mate') openPurchaseDialog('', id);
@@ -1194,10 +1229,28 @@ async function onClick(e) {
     }
     else if (a === 'levy-add') openLevyDialog('');
     else if (a === 'levy-edit') openLevyDialog(id);
-    else if (a === 'levy-pick') { selectedLevy = id; renderDues(); }
+    else if (a === 'levy-pick') {
+      selectedLevy = id;
+      pages.due = 1;
+      renderDues();
+      const l = levyById(id);
+      if (l) toast('Showing: ' + l.title);
+      try {
+        const box = $('dueList');
+        if (box && box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) { /* ignore */ }
+    }
     else if (a === 'levy-del') {
       const l = levyById(id);
-      if (l && confirm('Delete levy “' + l.title + '”?')) await deleteLevy(id);
+      if (!l) return;
+      if (dues.some((d) => d.levyId === id)) {
+        toast('This levy has recorded payments, so it cannot be deleted. Edit it instead.');
+        return;
+      }
+      if (confirm('Delete levy “' + l.title + '”?')) {
+        await deleteLevy(id);
+        toast('Levy deleted.');
+      }
     }
     else if (a === 'pay-add') openPayDialog(selectedLevy, '');
     else if (a === 'pay-edit') {
@@ -1228,12 +1281,37 @@ function toCSV(header, rows) {
   rows.forEach((r) => lines.push(r.map(csvCell).join(',')));
   return '﻿' + lines.join('\r\n');
 }
+function detectDelim(t) {
+  const cands = [',', ';', '\t'];
+  const counts = [0, 0, 0];
+  const lines = String(t).split(/\r?\n/).slice(0, 3);
+  for (let li = 0; li < lines.length; li++) {
+    const ln = lines[li];
+    let q = false;
+    for (let i = 0; i < ln.length; i++) {
+      const c = ln[i];
+      if (c === '"') {
+        if (ln[i + 1] === '"') i++;
+        else q = !q;
+      } else if (!q) {
+        const k = cands.indexOf(c);
+        if (k !== -1) counts[k]++;
+      }
+    }
+  }
+  let best = 0;
+  for (let k = 1; k < cands.length; k++) {
+    if (counts[k] > counts[best]) best = k;
+  }
+  return counts[best] ? cands[best] : ',';
+}
 function parseCSV(text) {
   const rows = [];
   let row = [];
   let cur = '';
   let q = false;
   const t = String(text || '').replace(/^\uFEFF/, '');
+  const delim = detectDelim(t);
   for (let i = 0; i < t.length; i++) {
     const c = t[i];
     if (q) {
@@ -1243,7 +1321,7 @@ function parseCSV(text) {
       } else cur += c;
     } else {
       if (c === '"') q = true;
-      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === delim) { row.push(cur); cur = ''; }
       else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
       else if (c === '\r') { /* skip */ }
       else cur += c;
@@ -1253,16 +1331,92 @@ function parseCSV(text) {
   rows.push(row);
   return rows.filter((r) => r.length > 1 || String(r[0] || '').trim() !== '');
 }
+/* Header matching ignores case, spaces and punctuation so that
+   "Matric No.", "matricno" and "Matric Number" all match. */
+const normKey = (s) => String(s == null ? '' : s).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+const COLS = {
+  name: ['name', 'fullname', 'full name', 'studentname', 'student name'],
+  matric: ['matric', 'matricno', 'matric no', 'matric number', 'matric no.', 'id', 'studentid', 'student id', 'regno', 'reg no'],
+  phone: ['phone', 'phoneno', 'phone no', 'phonenumber', 'phone number', 'tel', 'telephone', 'mobile', 'whatsapp', 'number'],
+  book: ['book', 'booktitle', 'book title', 'title', 'name'],
+  price: ['price', 'amount', 'cost', 'unitprice', 'unit price', 'rate'],
+  qty: ['qty', 'quantity', 'copies'],
+  paid: ['paid', 'amount', 'amountpaid', 'amount paid', 'paidamount', 'paid amount'],
+  bought: ['bought', 'paidinfull', 'paid in full', 'fullpaid', 'fully paid'],
+  status: ['status'],
+  date: ['date', 'paymentdate', 'payment date', 'saledate', 'sale date'],
+  levy: ['levy', 'levyname', 'levy name', 'due', 'dues', 'title', 'name'],
+  levyTitle: ['title', 'levy', 'levyname', 'levy name', 'due', 'dues', 'name'],
+  note: ['note', 'notes', 'comment', 'remarks', 'remark', 'description'],
+  deadline: ['deadline', 'duedate', 'due date', 'date', 'due']
+};
 function colIndex(header) {
   const map = {};
-  header.forEach((h, i) => { map[norm(h)] = i; });
+  header.forEach((h, i) => {
+    const k = normKey(h);
+    if (k && !(k in map)) map[k] = i;
+  });
   return (row, names) => {
     for (let k = 0; k < names.length; k++) {
-      const i = map[norm(names[k])];
+      const i = map[normKey(names[k])];
       if (i !== undefined && row[i] !== undefined) return String(row[i]).trim();
     }
     return '';
   };
+}
+function headerRecognized(header, keys) {
+  const known = {};
+  keys.forEach((k) => (COLS[k] || []).forEach((a) => { known[normKey(a)] = true; }));
+  return (header || []).some((h) => known[normKey(h)]);
+}
+function missingCols(header, pairs) {
+  const cells = {};
+  (header || []).forEach((h) => { const k = normKey(h); if (k) cells[k] = true; });
+  const out = [];
+  pairs.forEach((pr) => {
+    const hit = (COLS[pr[0]] || []).some((a) => cells[normKey(a)]);
+    if (!hit) out.push(pr[1]);
+  });
+  return out;
+}
+/* Files without a header row are imported positionally so a plain
+   name,matric,phone list just works; relational imports (sales,
+   payments) always require a header so columns cannot be misread. */
+function splitHeader(rows, keys, assumed) {
+  if (!rows.length) return { header: [], start: 1, assumedHeader: false, empty: true };
+  const h0 = rows[0];
+  if (!headerRecognized(h0, keys) && h0.length > 1) {
+    return { header: assumed, start: 0, assumedHeader: true, empty: false };
+  }
+  return { header: h0, start: 1, assumedHeader: false, empty: false };
+}
+const isBlankRow = (row) => !row.some((c) => String(c == null ? '' : c).trim() !== '');
+const normDate = (s) => {
+  const v = String(s || '').trim();
+  return /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : todayStr();
+};
+function newImportRes() {
+  return { added: 0, updated: 0, skipped: 0, assumedHeader: false, missing: [], sampleSkips: [], empty: false };
+}
+function fmtImport(label, r, extra) {
+  extra = extra || {};
+  if (r.empty) return 'That file is empty — nothing to import.';
+  const done = r.added + (extra.updated ? (r.updated || 0) : 0);
+  let s = 'Imported ' + label + ': ' + r.added + ' added';
+  if (extra.updated) s += ', ' + (r.updated || 0) + ' updated';
+  if (r.skipped) s += ', ' + r.skipped + ' skipped' + (extra.skipWhy ? ' (' + extra.skipWhy + ')' : '');
+  const notes = [];
+  if (r.assumedHeader && extra.assumedCols) notes.push('no header row found, assumed ' + extra.assumedCols);
+  if (r.sampleSkips && r.sampleSkips.length) notes.push(r.sampleSkips.join('; '));
+  if (!done && r.missing && r.missing.length) {
+    let mm = 'missing column(s): ' + r.missing.join(', ');
+    if (extra.seen && extra.seen.length) mm += ' (saw: ' + extra.seen.slice(0, 6).join(', ') + ')';
+    notes.push(mm);
+  } else if (!done && !r.skipped && !r.assumedHeader) {
+    notes.push('nothing to import — check the file has data rows');
+  }
+  if (notes.length) s += '. ' + notes.join('. ');
+  return s + '.';
 }
 function downloadFile(name, text, type) {
   const blob = new Blob([text], { type: type || 'text/plain;charset=utf-8' });
@@ -1329,20 +1483,24 @@ function exportBackup() {
 }
 
 async function importMates(rows) {
-  if (!rows.length) return { added: 0, updated: 0 };
-  const get = colIndex(rows[0]);
-  let added = 0, updated = 0;
-  for (let i = 1; i < rows.length; i++) {
-    const name = get(rows[i], ['name', 'fullname', 'full name']);
-    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'matric number', 'id']);
-    const phone = get(rows[i], ['phone', 'tel', 'telephone', 'number']);
-    if (!name || !matric) continue;
+  const res = newImportRes();
+  const sp = splitHeader(rows, ['name', 'matric', 'phone'], ['name', 'matric', 'phone']);
+  if (sp.empty) { res.empty = true; return res; }
+  res.assumedHeader = sp.assumedHeader;
+  const get = colIndex(sp.header);
+  res.missing = sp.assumedHeader ? [] : missingCols(sp.header, [['name', 'name'], ['matric', 'matric']]);
+  for (let i = sp.start; i < rows.length; i++) {
+    if (isBlankRow(rows[i])) continue;
+    const name = get(rows[i], COLS.name);
+    const matric = get(rows[i], COLS.matric);
+    const phone = get(rows[i], COLS.phone);
+    if (!name || !matric) { res.skipped++; continue; }
     const ex = mateByMatric(matric);
     await saveMateSilent({ id: ex ? ex.id : '', name, matric, phone });
-    if (ex) updated++; else added++;
+    if (ex) res.updated++; else res.added++;
   }
   renderAll();
-  return { added, updated };
+  return res;
 }
 async function saveMateSilent(d) {
   const row = {
@@ -1357,93 +1515,122 @@ async function saveMateSilent(d) {
   return row;
 }
 async function importBooks(rows) {
-  if (!rows.length) return { added: 0, updated: 0 };
-  const get = colIndex(rows[0]);
-  let added = 0, updated = 0;
-  for (let i = 1; i < rows.length; i++) {
-    const title = get(rows[i], ['title', 'book', 'name']);
-    const price = Number(get(rows[i], ['price', 'amount', 'cost']) || 0);
-    if (!title) continue;
+  const res = newImportRes();
+  const sp = splitHeader(rows, ['book', 'price'], ['title', 'price']);
+  if (sp.empty) { res.empty = true; return res; }
+  res.assumedHeader = sp.assumedHeader;
+  const get = colIndex(sp.header);
+  res.missing = sp.assumedHeader ? [] : missingCols(sp.header, [['book', 'title']]);
+  for (let i = sp.start; i < rows.length; i++) {
+    if (isBlankRow(rows[i])) continue;
+    const title = get(rows[i], COLS.book);
+    const price = Number(get(rows[i], COLS.price) || 0);
+    if (!title) { res.skipped++; continue; }
     const ex = bookByTitle(title);
     const row = { id: ex ? ex.id : uid(), title, price: Math.max(0, price) };
     await dbPut('books', row);
     const j = books.findIndex((b) => b.id === row.id);
     if (j === -1) books.push(row); else books[j] = row;
-    if (ex) updated++; else added++;
+    if (ex) res.updated++; else res.added++;
   }
   renderAll();
-  return { added, updated };
+  return res;
 }
 async function importLevies(rows) {
-  if (!rows.length) return { added: 0, updated: 0 };
-  const get = colIndex(rows[0]);
-  let added = 0, updated = 0;
-  for (let i = 1; i < rows.length; i++) {
-    const title = get(rows[i], ['title', 'levy', 'name', 'due']);
-    const amount = Number(get(rows[i], ['amount', 'price']) || 0);
-    const deadline = get(rows[i], ['deadline', 'due date', 'date']);
-    if (!title) continue;
+  const res = newImportRes();
+  const sp = splitHeader(rows, ['levyTitle', 'price', 'deadline'], ['title', 'amount', 'deadline']);
+  if (sp.empty) { res.empty = true; return res; }
+  res.assumedHeader = sp.assumedHeader;
+  const get = colIndex(sp.header);
+  res.missing = sp.assumedHeader ? [] : missingCols(sp.header, [['levyTitle', 'title']]);
+  for (let i = sp.start; i < rows.length; i++) {
+    if (isBlankRow(rows[i])) continue;
+    const title = get(rows[i], COLS.levyTitle);
+    const amount = Number(get(rows[i], COLS.price) || 0);
+    const deadline = get(rows[i], COLS.deadline);
+    if (!title) { res.skipped++; continue; }
     const ex = levyByTitle(title);
     const row = { id: ex ? ex.id : uid(), title, amount: Math.max(0, amount), deadline };
     await dbPut('levies', row);
     const j = levies.findIndex((l) => l.id === row.id);
     if (j === -1) { levies.push(row); } else levies[j] = row;
-    if (ex) updated++; else added++;
+    if (ex) res.updated++; else res.added++;
   }
   if (!levyById(selectedLevy) && levies.length) selectedLevy = levies[0].id;
   renderAll();
-  return { added, updated };
+  return res;
+}
+function noteSkip(res, i, whys) {
+  res.skipped++;
+  if (res.sampleSkips.length < 3) res.sampleSkips.push('row ' + (i + 1) + ': ' + whys.join(', '));
 }
 async function importPurchases(rows) {
-  if (!rows.length) return { added: 0, skipped: 0 };
+  const res = newImportRes();
+  if (!rows.length) { res.empty = true; return res; }
   const get = colIndex(rows[0]);
-  let added = 0, skipped = 0;
+  res.missing = missingCols(rows[0], [['matric', 'matric'], ['book', 'book']]);
   for (let i = 1; i < rows.length; i++) {
-    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'id']);
-    const title = get(rows[i], ['book', 'title', 'name']);
+    if (isBlankRow(rows[i])) continue;
+    const matric = get(rows[i], COLS.matric);
+    const title = get(rows[i], COLS.book);
     const m = matric ? mateByMatric(matric) : null;
     const b = title ? bookByTitle(title) : null;
-    if (!m || !b) { skipped++; continue; }
-    const unit = Number(get(rows[i], ['unitprice', 'unit price', 'price']) || b.price || 0);
-    const qty = Math.max(1, parseInt(get(rows[i], ['qty', 'quantity']) || '1', 10) || 1);
-    let payAmt = Math.max(0, Number(get(rows[i], ['paid', 'amount']) || 0));
-    const boughtYes = ['yes', 'true', '1', 'y'].indexOf(norm(get(rows[i], ['bought']))) !== -1;
+    if (!m || !b) {
+      const why = [];
+      if (!m) why.push('unknown matric "' + (matric || '—') + '"');
+      if (!b) why.push('unknown book "' + (title || '—') + '"');
+      noteSkip(res, i, why);
+      continue;
+    }
+    const unit = Number(get(rows[i], COLS.price) || b.price || 0);
+    const qty = Math.max(1, parseInt(get(rows[i], COLS.qty) || '1', 10) || 1);
+    let payAmt = Math.max(0, Number(get(rows[i], COLS.paid) || 0));
+    const boughtYes = ['yes', 'true', '1', 'y'].indexOf(norm(get(rows[i], COLS.bought))) !== -1
+      || norm(get(rows[i], COLS.status)) === 'paid';
     if (boughtYes && payAmt <= 0) payAmt = unit * qty;
     const row = {
       id: uid(), mateId: m.id, bookId: b.id, bookTitle: b.title,
       unitPrice: unit, qty, paid: payAmt,
-      date: get(rows[i], ['date']) || todayStr(),
-      note: get(rows[i], ['note', 'notes', 'comment'])
+      date: normDate(get(rows[i], COLS.date)),
+      note: get(rows[i], COLS.note)
     };
     await dbPut('purchases', row);
     purchases.push(row);
-    added++;
+    res.added++;
   }
   renderAll();
-  return { added, skipped };
+  return res;
 }
 async function importPayments(rows) {
-  if (!rows.length) return { added: 0, skipped: 0 };
+  const res = newImportRes();
+  if (!rows.length) { res.empty = true; return res; }
   const get = colIndex(rows[0]);
-  let added = 0, skipped = 0;
+  res.missing = missingCols(rows[0], [['matric', 'matric'], ['levy', 'levy']]);
   for (let i = 1; i < rows.length; i++) {
-    const matric = get(rows[i], ['matric', 'matricno', 'matric no', 'id']);
-    const title = get(rows[i], ['levy', 'title', 'due', 'name']);
+    if (isBlankRow(rows[i])) continue;
+    const matric = get(rows[i], COLS.matric);
+    const title = get(rows[i], COLS.levy);
     const m = matric ? mateByMatric(matric) : null;
     const l = title ? levyByTitle(title) : null;
-    if (!m || !l) { skipped++; continue; }
+    if (!m || !l) {
+      const why = [];
+      if (!m) why.push('unknown matric "' + (matric || '—') + '"');
+      if (!l) why.push('unknown levy "' + (title || '—') + '"');
+      noteSkip(res, i, why);
+      continue;
+    }
     const row = {
       id: uid(), levyId: l.id, levyTitle: l.title, mateId: m.id,
-      paid: Math.max(0, Number(get(rows[i], ['paid', 'amount']) || 0)),
-      date: get(rows[i], ['date']) || todayStr(),
-      note: get(rows[i], ['note', 'notes', 'comment'])
+      paid: Math.max(0, Number(get(rows[i], COLS.paid) || 0)),
+      date: normDate(get(rows[i], COLS.date)),
+      note: get(rows[i], COLS.note)
     };
     await dbPut('dues', row);
     dues.push(row);
-    added++;
+    res.added++;
   }
   renderAll();
-  return { added, skipped };
+  return res;
 }
 async function importBackup(obj) {
   if (!obj || obj.app !== 'book-manager' || !Array.isArray(obj.mates)) {
@@ -1470,17 +1657,29 @@ function wireFileInput(inputId, onText) {
     const f = inp.files && inp.files[0];
     inp.value = '';
     if (!f) return;
-    const rd = new FileReader();
-    rd.onload = async () => {
+    const done = async (text) => {
       try {
-        const msg = await onText(String(rd.result || ''));
+        const msg = await onText(String(text || ''));
         toast(msg);
       } catch (err) {
         toast(err && err.message ? err.message : 'Import failed.');
       }
     };
-    rd.onerror = () => toast('Could not read that file.');
-    rd.readAsText(f);
+    const tryModernRead = () => {
+      if (f.text) {
+        try {
+          const p = f.text();
+          if (p && p.then) { p.then(done, () => toast('Could not read that file.')); return; }
+        } catch (e) { /* fall through */ }
+      }
+      toast('Could not read that file.');
+    };
+    try {
+      const rd = new FileReader();
+      rd.onload = () => { done(rd.result); };
+      rd.onerror = () => { tryModernRead(); };
+      rd.readAsText(f);
+    } catch (e) { tryModernRead(); }
   });
 }
 
@@ -1697,6 +1896,14 @@ function wireForms() {
     const lv = levyById(pl.value);
     if (lv && m) $('payAmt').value = Math.max(0, Number(lv.amount || 0) - duePaidFor(lv.id, m.id));
   });
+  const pmIn = $('payMate');
+  if (pmIn) pmIn.addEventListener('input', () => {
+    const amt = $('payAmt');
+    if (amt && String(amt.value || '').trim() !== '') return;
+    const m = resolveMate(pmIn.value);
+    const lv = levyById($('payLevy').value);
+    if (lv && m) amt.value = Math.max(0, Number(lv.amount || 0) - duePaidFor(lv.id, m.id));
+  });
 
   $('pBought').addEventListener('change', syncPurPaid);
   const plBox = $('pLines');
@@ -1708,8 +1915,12 @@ function wireForms() {
   if (alBtn) alBtn.addEventListener('click', () => { addPurLine('', 1); });
   const pa = $('btnPurAnother');
   if (pa) pa.addEventListener('click', () => {
-    purAnother = true;
     const f = $('formPur');
+    if (f && f.checkValidity && !f.checkValidity()) {
+      if (f.reportValidity) f.reportValidity();
+      return;
+    }
+    purAnother = true;
     if (f && f.requestSubmit) f.requestSubmit();
   });
 
@@ -1748,24 +1959,29 @@ function wireForms() {
   });
 
   wireFileInput('fileMates', async (t) => {
-    const r = await importMates(parseCSV(t));
-    return 'Imported coursemates: ' + r.added + ' added, ' + r.updated + ' updated.';
+    const rows = parseCSV(t);
+    const r = await importMates(rows);
+    return fmtImport('coursemates', r, { updated: true, skipWhy: 'missing name or matric', assumedCols: 'name, matric, phone', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('fileBooks', async (t) => {
-    const r = await importBooks(parseCSV(t));
-    return 'Imported books: ' + r.added + ' added, ' + r.updated + ' updated.';
+    const rows = parseCSV(t);
+    const r = await importBooks(rows);
+    return fmtImport('books', r, { updated: true, skipWhy: 'missing title', assumedCols: 'title, price', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('filePur', async (t) => {
-    const r = await importPurchases(parseCSV(t));
-    return 'Imported sales: ' + r.added + ' added, ' + r.skipped + ' skipped (unknown matric or book).';
+    const rows = parseCSV(t);
+    const r = await importPurchases(rows);
+    return fmtImport('sales', r, { skipWhy: 'unknown matric or book', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('fileLev', async (t) => {
-    const r = await importLevies(parseCSV(t));
-    return 'Imported levies: ' + r.added + ' added, ' + r.updated + ' updated.';
+    const rows = parseCSV(t);
+    const r = await importLevies(rows);
+    return fmtImport('levies', r, { updated: true, skipWhy: 'missing title', assumedCols: 'title, amount, deadline', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('filePay', async (t) => {
-    const r = await importPayments(parseCSV(t));
-    return 'Imported payments: ' + r.added + ' added, ' + r.skipped + ' skipped (unknown matric or levy).';
+    const rows = parseCSV(t);
+    const r = await importPayments(rows);
+    return fmtImport('payments', r, { skipWhy: 'unknown matric or levy', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('fileBackup', async (t) => {
     let obj;
