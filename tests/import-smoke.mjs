@@ -136,4 +136,44 @@ await t('empty file imports nothing without throwing', async () => {
   assert.equal(r.added, 0);
 });
 
+await t('mates re-import with same matric updates instead of duplicating', async () => {
+  const before = globalThis.window.App.getState().mates.length;
+  const r = await imp(A.importMates, 'name,matric,phone\nJane Doe,SCI/2024/002,0809\n');
+  assert.equal(r.added, 0);
+  assert.equal(r.updated, 1);
+  assert.equal(r.skipped, 0);
+  const mate = globalThis.window.App.getState().mates.find((x) => x.matric === 'SCI/2024/002');
+  assert.equal(mate && mate.phone, '0809');
+  assert.equal(globalThis.window.App.getState().mates.length, before);
+});
+
+await t('purchases skip exact duplicates already recorded', async () => {
+  const r = await imp(
+    A.importPurchases,
+    'Date,Matric No,Book Title,Quantity,Amount Paid\n2026-01-05,SCI/2023/001,Engineering Mathematics II,1,4500\n'
+  );
+  assert.equal(r.added, 0);
+  assert.equal(r.skipped, 1);
+  assert.ok(/duplicate/i.test(r.sampleSkips.join(' ')), 'expected duplicate reason, got: ' + JSON.stringify(r.sampleSkips));
+});
+
+await t('purchases skip duplicate rows within the same file', async () => {
+  const r = await imp(
+    A.importPurchases,
+    'date,matric,book,qty,paid\n2026-03-01,SCI/2023/001,Engineering Mathematics II,1,100\n2026-03-01,SCI/2023/001,Engineering Mathematics II,1,100\n'
+  );
+  assert.equal(r.added, 1);
+  assert.equal(r.skipped, 1);
+});
+
+await t('payments skip exact duplicates already recorded', async () => {
+  const r = await imp(
+    A.importPayments,
+    'date,matric,levy,paid\n2026-01-06,SCI/2023/001,Departmental Dues,2000\n'
+  );
+  assert.equal(r.added, 0);
+  assert.equal(r.skipped, 1);
+  assert.ok(/duplicate/i.test(r.sampleSkips.join(' ')), 'expected duplicate reason, got: ' + JSON.stringify(r.sampleSkips));
+});
+
 console.log('pass: ' + n + ' import checks');

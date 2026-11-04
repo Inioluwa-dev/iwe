@@ -28,19 +28,21 @@ main.wrap{padding-bottom:130px}
 section.tab{padding-top:16px}
 section.tab[hidden]{display:none}
 h2{font-size:14px;font-weight:750;margin:20px 0 8px;letter-spacing:.005em}
-.sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 8px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 8px;flex-wrap:wrap}
 .sec-head h2{margin:0}
+.sec-head .btn{flex-shrink:0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);min-width:0}
 .stat .k{font-size:12px;font-weight:650;color:var(--muted)}
-.stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;letter-spacing:-.01em}
+.stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;letter-spacing:-.01em;overflow-wrap:break-word}
 #stOut{color:var(--danger)}
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-.row{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--row-line);min-height:54px}
+.row{display:flex;align-items:center;gap:8px 10px;padding:13px 16px;border-bottom:1px solid var(--row-line);min-height:54px;flex-wrap:wrap}
 .row:last-child{border-bottom:0}
 @media(hover:hover){.row:hover{background:#faf5e6}}
-.row .grow{flex:1;min-width:0}
+.row .grow{flex:1 1 160px;min-width:0}
+.row>.money,.row>.pill{flex-shrink:0}
 .row .t{font-weight:650;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .s{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .btns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
@@ -49,15 +51,17 @@ h2{font-size:14px;font-weight:750;margin:20px 0 8px;letter-spacing:.005em}
 .paid{background:var(--green-bg);color:var(--acc)}
 .partial{background:var(--amber-bg);color:var(--amber)}
 .unpaid{background:var(--red-bg);color:var(--danger)}
-.money{font-variant-numeric:tabular-nums;font-weight:750}
+.money{font-variant-numeric:tabular-nums;font-weight:750;white-space:nowrap}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.toolbar>*{min-width:0}
+.toolbar select{max-width:100%}
 input[type=text],input[type=search],input[type=number],input[type=date],input[type=tel],select,textarea{
   font:inherit;font-size:16px;padding:11px 12px;border:1px solid #c8bfa1;border-radius:12px;
   background:#fff;color:var(--ink);width:100%}
 input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .search{flex:1;min-width:150px}
 .btn{font:inherit;font-size:15px;font-weight:650;border:1px solid transparent;border-radius:12px;
-  padding:11px 16px;min-height:44px;cursor:pointer;background:var(--acc);color:#fff;
+  padding:11px 16px;min-height:44px;max-width:100%;cursor:pointer;background:var(--acc);color:#fff;
   box-shadow:0 1px 3px rgba(143,47,60,.35)}
 .btn:active{transform:translateY(1px);box-shadow:none}
 .btn-ghost{background:#fff;border-color:#c8bfa1;color:var(--ink);box-shadow:none}
@@ -69,13 +73,14 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:#fffdf6;bor
 nav.tabs .in{max-width:660px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 nav.tabs button{font:inherit;background:none;border:0;border-top:3px solid transparent;
   display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:9px 4px 12px;font-size:12px;font-weight:650;color:var(--muted);cursor:pointer;min-height:66px}
+  padding:9px 4px 12px;font-size:12px;font-weight:650;color:var(--muted);cursor:pointer;min-height:66px;min-width:0}
 nav.tabs button svg{width:23px;height:23px}
 nav.tabs button[aria-current=page]{color:var(--acc);border-top-color:var(--acc)}
 dialog{border:1px solid var(--line);border-radius:20px;padding:0;max-width:440px;width:calc(100% - 28px);
+  max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow:auto;
   box-shadow:0 18px 50px rgba(20,30,20,.3)}
 dialog::backdrop{background:rgba(24,32,22,.55)}
-.head-in{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.head-in{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .credit{text-align:center;font-size:13px;color:var(--muted);margin:24px 0 6px;padding-top:14px;border-top:1px solid var(--line)}
 .credit a,.dlg-body .kv a{color:var(--acc);font-weight:600}
 .dlg-body{padding:20px}
@@ -83,24 +88,27 @@ dialog::backdrop{background:rgba(24,32,22,.55)}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}
 .field .hint{font-size:12px;color:var(--muted);margin-top:4px}
-.dlg-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;background:#202825;color:#fff;
   padding:11px 18px;border-radius:12px;font-size:14px;font-weight:650;opacity:0;pointer-events:none;
   transition:opacity .2s;z-index:20;max-width:calc(100% - 32px);text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 #toast.show{opacity:1}
 .note{font-size:13px;color:var(--muted)}
-.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.kv{display:flex;justify-content:space-between;gap:4px 10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px;flex-wrap:wrap}
+.kv>*{min-width:0;overflow-wrap:break-word}
+.kv>:last-child{margin-left:auto;text-align:right}
 .kv:last-child{border-bottom:0}
 .check{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:650;cursor:pointer}
 .check input{width:22px;height:22px;accent-color:#8f2f3c;flex-shrink:0}
 .kv input[type=checkbox]{width:20px;height:20px;accent-color:#8f2f3c;vertical-align:-4px;margin-right:8px}
-.row.pager{justify-content:center;gap:14px}
+.row.pager{justify-content:center;gap:8px 14px}
 .row.pager .pg{font-size:14px;color:var(--muted);white-space:nowrap}
 .row.pager .btn:disabled{opacity:.45;cursor:default}
 .pline{display:flex;gap:6px;margin-bottom:8px}
-.pline select{flex:1;min-width:0}
-.pline input{width:64px;flex-shrink:0}
+.pline select{flex:1 1 auto;min-width:0;width:auto}
+.pline input{width:64px;flex:0 0 64px;min-width:0}
+.pline .btn{flex-shrink:0}
 /* File inputs stay rendered (but invisible) so mobile browsers reliably
    open the file picker when the visible Import button is tapped. */
 input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opacity:0;overflow:hidden;pointer-events:none;border:0}
@@ -112,6 +120,24 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (min-width:700px){h1{font-size:28px}}
+/* Narrow phones: stack each row's content so money, status and buttons
+   drop to their own lines instead of squeezing off-screen. */
+@media (max-width:520px){
+  .row{align-items:flex-start;padding:12px 14px}
+  .row .grow{flex:1 1 100%}
+  .row .btns{flex:1 1 100%;justify-content:flex-start}
+  .toolbar .search{flex:1 1 100%}
+}
+@media (max-width:400px){
+  .wrap{padding:0 12px}
+  .card{padding:14px}
+  .stat{padding:12px}
+  .stat .v{font-size:19px}
+  .dlg-body{padding:16px}
+  .dlg-actions .btn{flex:1 1 100%}
+  .pline input{width:56px;flex-basis:56px}
+  nav.tabs button{font-size:11px;padding:8px 2px 10px}
+}
 </style>
 </head>
 <body>
@@ -140,15 +166,19 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
     <div class="sec-head"><h2>Needs attention</h2><span class="note" id="attCount"></span></div>
     <div class="list" id="attention"></div>
 
-    <h2>Data backup</h2>
+    <h2>Data</h2>
     <div class="card">
       <p class="note" style="margin-top:0">All records stay in this browser (IndexedDB). Export a backup before clearing browser data or switching devices.</p>
       <div class="toolbar" style="margin-bottom:0">
+        <button type="button" class="btn btn-ghost btn-sm" id="btnImpMates">Import coursemates</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnExpMates">Export coursemates</button>
         <button type="button" class="btn btn-ghost btn-sm" id="btnExportAll">Export backup (JSON)</button>
         <button type="button" class="btn btn-ghost btn-sm" id="btnImportAll">Import backup</button>
         <button type="button" class="btn btn-danger btn-sm" id="btnWipe">Erase everything</button>
       </div>
+      <input type="file" id="fileMates" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
       <input type="file" id="fileBackup" class="file-hidden" tabindex="-1" aria-hidden="true" accept="application/json,.json">
+      <p class="note" style="margin-bottom:0">Coursemate import accepts CSV with columns <strong>name, matric, phone</strong> (header row optional). A row with an existing matric number updates that coursemate instead of duplicating.</p>
     </div>
 
     <footer class="credit">Built by <strong>Inioluwa Olayoriju</strong> &middot; <a href="tel:+2349133770970">+234 9133770970</a></footer>
@@ -161,11 +191,8 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
     </div>
     <div class="toolbar">
       <input type="search" class="search" id="mateSearch" placeholder="Search name or matric no…" aria-label="Search coursemates">
-      <button type="button" class="btn btn-ghost btn-sm" id="btnExpMates">Export CSV</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnImpMates">Import CSV</button>
-      <input type="file" id="fileMates" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
-    <p class="note">Add all coursemates once, then tap a name anywhere to record a book sale or dues payment.</p>
+    <p class="note">Add all coursemates once — or import the class list from the Data section on Home — then tap a name anywhere to record a book sale or dues payment.</p>
     <div class="list" id="mateList"></div>
   </section>
 
@@ -174,11 +201,6 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
       <h2>Book catalog</h2>
       <button type="button" class="btn btn-sm" data-action="book-add">+ Add book</button>
     </div>
-    <div class="toolbar">
-      <button type="button" class="btn btn-ghost btn-sm" id="btnExpBooks">Export catalog</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnImpBooks">Import catalog</button>
-      <input type="file" id="fileBooks" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
-    </div>
     <div class="list" id="bookList"></div>
 
     <div class="sec-head">
@@ -186,15 +208,12 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
       <button type="button" class="btn btn-sm" data-action="pur-add">+ Record sale</button>
     </div>
     <div class="toolbar">
-      <select id="purFilter" aria-label="Filter purchases" style="flex:1;min-width:140px">
+      <select id="purFilter" aria-label="Filter purchases" style="flex:1 1 140px;min-width:0">
         <option value="all">All purchases</option>
         <option value="paid">Paid</option>
         <option value="partial">Partly paid</option>
         <option value="unpaid">Unpaid</option>
       </select>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnExpPur">Export CSV</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnImpPur">Import CSV</button>
-      <input type="file" id="filePur" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="purList"></div>
   </section>
@@ -204,11 +223,6 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
       <h2>Levies &amp; dues</h2>
       <button type="button" class="btn btn-sm" data-action="levy-add">+ Add levy</button>
     </div>
-    <div class="toolbar">
-      <button type="button" class="btn btn-ghost btn-sm" id="btnExpLev">Export levies</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnImpLev">Import levies</button>
-      <input type="file" id="fileLev" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
-    </div>
     <div class="list" id="levyList"></div>
 
     <div class="sec-head">
@@ -216,17 +230,12 @@ input.file-hidden{position:absolute;width:1px;height:1px;padding:0;margin:0;opac
       <button type="button" class="btn btn-sm" data-action="pay-add">+ Record payment</button>
     </div>
     <div class="toolbar">
-      <select id="levySel" aria-label="Choose levy" style="flex:2;min-width:150px"></select>
-      <select id="dueFilter" aria-label="Filter payments" style="flex:1;min-width:130px">
+      <select id="levySel" aria-label="Choose levy" style="flex:2 1 160px;min-width:0"></select>
+      <select id="dueFilter" aria-label="Filter payments" style="flex:1 1 140px;min-width:0">
         <option value="all">Everyone</option>
         <option value="paid">Paid</option>
         <option value="unpaid">Unpaid / partial</option>
       </select>
-    </div>
-    <div class="toolbar">
-      <button type="button" class="btn btn-ghost btn-sm" id="btnExpPay">Export payments</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="btnImpPay">Import payments</button>
-      <input type="file" id="filePay" class="file-hidden" tabindex="-1" aria-hidden="true" accept=".csv,text/csv">
     </div>
     <div class="list" id="dueList"></div>
 
@@ -1564,11 +1573,21 @@ function noteSkip(res, i, whys) {
   res.skipped++;
   if (res.sampleSkips.length < 3) res.sampleSkips.push('row ' + (i + 1) + ': ' + whys.join(', '));
 }
+/* Exact-duplicate keys so re-importing the same file never doubles
+   sales or payments; near-matches still import as new records. */
+function purKey(mateId, bookId, qty, unit, paid, date, note) {
+  return [mateId, bookId, qty, unit, paid, date, note].join('');
+}
+function payKey(mateId, levyId, paid, date, note) {
+  return [mateId, levyId, paid, date, note].join('');
+}
 async function importPurchases(rows) {
   const res = newImportRes();
   if (!rows.length) { res.empty = true; return res; }
   const get = colIndex(rows[0]);
   res.missing = missingCols(rows[0], [['matric', 'matric'], ['book', 'book']]);
+  const seen = {};
+  purchases.forEach((p) => { seen[purKey(p.mateId, p.bookId, p.qty, p.unitPrice, p.paid, p.date, p.note)] = true; });
   for (let i = 1; i < rows.length; i++) {
     if (isBlankRow(rows[i])) continue;
     const matric = get(rows[i], COLS.matric);
@@ -1588,11 +1607,14 @@ async function importPurchases(rows) {
     const boughtYes = ['yes', 'true', '1', 'y'].indexOf(norm(get(rows[i], COLS.bought))) !== -1
       || norm(get(rows[i], COLS.status)) === 'paid';
     if (boughtYes && payAmt <= 0) payAmt = unit * qty;
+    const date = normDate(get(rows[i], COLS.date));
+    const note = get(rows[i], COLS.note);
+    const key = purKey(m.id, b.id, qty, unit, payAmt, date, note);
+    if (seen[key]) { noteSkip(res, i, ['duplicate of an already recorded sale']); continue; }
+    seen[key] = true;
     const row = {
       id: uid(), mateId: m.id, bookId: b.id, bookTitle: b.title,
-      unitPrice: unit, qty, paid: payAmt,
-      date: normDate(get(rows[i], COLS.date)),
-      note: get(rows[i], COLS.note)
+      unitPrice: unit, qty, paid: payAmt, date, note
     };
     await dbPut('purchases', row);
     purchases.push(row);
@@ -1606,6 +1628,8 @@ async function importPayments(rows) {
   if (!rows.length) { res.empty = true; return res; }
   const get = colIndex(rows[0]);
   res.missing = missingCols(rows[0], [['matric', 'matric'], ['levy', 'levy']]);
+  const seen = {};
+  dues.forEach((d) => { seen[payKey(d.mateId, d.levyId, d.paid, d.date, d.note)] = true; });
   for (let i = 1; i < rows.length; i++) {
     if (isBlankRow(rows[i])) continue;
     const matric = get(rows[i], COLS.matric);
@@ -1619,11 +1643,14 @@ async function importPayments(rows) {
       noteSkip(res, i, why);
       continue;
     }
+    const paid = Math.max(0, Number(get(rows[i], COLS.paid) || 0));
+    const date = normDate(get(rows[i], COLS.date));
+    const note = get(rows[i], COLS.note);
+    const key = payKey(m.id, l.id, paid, date, note);
+    if (seen[key]) { noteSkip(res, i, ['duplicate of an already recorded payment']); continue; }
+    seen[key] = true;
     const row = {
-      id: uid(), levyId: l.id, levyTitle: l.title, mateId: m.id,
-      paid: Math.max(0, Number(get(rows[i], COLS.paid) || 0)),
-      date: normDate(get(rows[i], COLS.date)),
-      note: get(rows[i], COLS.note)
+      id: uid(), levyId: l.id, levyTitle: l.title, mateId: m.id, paid, date, note
     };
     await dbPut('dues', row);
     dues.push(row);
@@ -1934,16 +1961,9 @@ function wireForms() {
     renderAll();
     toast('All data erased.');
   });
+  /* Only coursemate transfer has buttons (Data section); other lists move via backup. */
   $('btnExpMates').addEventListener('click', exportMates);
   $('btnImpMates').addEventListener('click', () => $('fileMates').click());
-  $('btnExpBooks').addEventListener('click', exportBooks);
-  $('btnImpBooks').addEventListener('click', () => $('fileBooks').click());
-  $('btnExpPur').addEventListener('click', exportPurchases);
-  $('btnImpPur').addEventListener('click', () => $('filePur').click());
-  $('btnExpLev').addEventListener('click', exportLevies);
-  $('btnImpLev').addEventListener('click', () => $('fileLev').click());
-  $('btnExpPay').addEventListener('click', exportPayments);
-  $('btnImpPay').addEventListener('click', () => $('filePay').click());
   $('btnReceiptPrint').addEventListener('click', () => {
     try { if (typeof window !== 'undefined' && window.print) window.print(); } catch (e) { /* ignore */ }
   });
@@ -1962,26 +1982,6 @@ function wireForms() {
     const rows = parseCSV(t);
     const r = await importMates(rows);
     return fmtImport('coursemates', r, { updated: true, skipWhy: 'missing name or matric', assumedCols: 'name, matric, phone', seen: rows.length ? rows[0] : [] });
-  });
-  wireFileInput('fileBooks', async (t) => {
-    const rows = parseCSV(t);
-    const r = await importBooks(rows);
-    return fmtImport('books', r, { updated: true, skipWhy: 'missing title', assumedCols: 'title, price', seen: rows.length ? rows[0] : [] });
-  });
-  wireFileInput('filePur', async (t) => {
-    const rows = parseCSV(t);
-    const r = await importPurchases(rows);
-    return fmtImport('sales', r, { skipWhy: 'unknown matric or book', seen: rows.length ? rows[0] : [] });
-  });
-  wireFileInput('fileLev', async (t) => {
-    const rows = parseCSV(t);
-    const r = await importLevies(rows);
-    return fmtImport('levies', r, { updated: true, skipWhy: 'missing title', assumedCols: 'title, amount, deadline', seen: rows.length ? rows[0] : [] });
-  });
-  wireFileInput('filePay', async (t) => {
-    const rows = parseCSV(t);
-    const r = await importPayments(rows);
-    return fmtImport('payments', r, { skipWhy: 'unknown matric or levy', seen: rows.length ? rows[0] : [] });
   });
   wireFileInput('fileBackup', async (t) => {
     let obj;
