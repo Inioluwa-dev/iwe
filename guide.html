@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to Use - Coursemate Book Tracker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal-950: #062f35; --teal-900: #0b3f45; --teal-800: #0e5960;
+      --teal-700: #0f766e; --teal-600: #0d9488; --teal-500: #14b8a6;
+      --teal-100: #ccfbf1; --teal-50: #f0fdfa; --ink: #102a2f;
+      --muted: #5e7377; --line: #d8e9e7; --surface: #ffffff; --soft: #f6fbfa;
+    }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #ecfdf9 0%, #f8fafc 54%, #eef8f6 100%);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(15, 118, 110, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 24px 70px rgba(6, 47, 53, 0.14);
+      overflow: hidden;
+    }
+    .header {
+      padding: 40px;
+      color: white;
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.23), transparent 45%), linear-gradient(135deg, var(--teal-950), var(--teal-700));
+      text-align: center;
+      position: relative;
+    }
+    .header h1 { margin-bottom: 10px; font-size: 2.4rem; letter-spacing: -0.5px; }
+    .header p { color: #d8fffa; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+    .header .credit { margin-top: 12px; font-size: 0.95rem; }
+    .header .credit a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      background: rgba(255,255,255,0.15);
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .content { padding: 40px; }
+    
+    .guide-section {
+      margin-bottom: 40px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(6, 47, 53, 0.04);
+      transition: transform 0.2s;
+    }
+    .guide-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(6, 47, 53, 0.08);
+    }
+    
+    .guide-section h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--teal-900);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--teal-50);
+      font-size: 1.5rem;
+    }
+    
+    .guide-section h2 .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: var(--teal-100);
+      color: var(--teal-800);
+      border-radius: 50%;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .guide-section h3 {
+      color: var(--teal-800);
+      margin: 20px 0 10px;
+      font-size: 1.15rem;
+    }
+
+    .guide-section p {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .info-box {
+      background: #fffbeb;
+      border-left: 4px solid #f5d78e;
+      padding: 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 20px 0;
+    }
+    .info-box p { color: #8a5a00; margin: 0; font-size: 0.95rem; font-weight: 500; }
+    
+    .danger-box {
+      background: #fff1f2;
+      border-left: 4px solid #fecdd3;
+      padding: 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 20px 0;
+    }
+    .danger-box p { color: #be123c; margin: 0; font-size: 0.95rem; font-weight: 500; }
+
+    ul { margin-left: 24px; color: var(--muted); margin-bottom: 16px; }
+    li { margin-bottom: 8px; }
+    strong { color: var(--teal-950); }
+
+    code {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: var(--teal-800);
+    }
+    
+    .code-block {
+      background: var(--ink);
+      color: #e2efed;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      .container { margin: 0; border-radius: 0; }
+      .header { padding: 40px 20px; }
+      .content { padding: 20px; }
+      .guide-section { padding: 20px; }
+      .back-btn { top: 10px; left: 10px; font-size: 0.9rem; padding: 6px 12px; }
+    }
+  
+    .guide-section {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .guide-section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .guide-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    
+    .btn-nav {
+      padding: 10px 24px;
+      background: var(--teal-700);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-nav:hover:not(:disabled) {
+      background: var(--teal-800);
+      transform: translateY(-1px);
+    }
+    .btn-nav:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-nav.btn-secondary {
+      background: #e6f4f2;
+      color: var(--teal-900);
+    }
+    .btn-nav.btn-secondary:hover:not(:disabled) {
+      background: #d7eeeb;
+    }
+    .guide-progress {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e2efed;
+      transition: background 0.3s;
+    }
+    .dot.active {
+      background: var(--teal-600);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <a href="index.html" class="back-btn">← Back to App</a>
+    <h1>How to Use Book Tracker</h1>
+    <p>Plain, step-by-step lessons that explain every page and every button. No tech knowledge needed.</p>
+    <p class="credit">Built by Olayoriju Inioluwa &middot; <a href="tel:+2349133770970">09133770970</a></p>
+  </div>
+
+  <div class="content">
+    <div class="progress-dots" id="progressDots"></div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">1</span> Start Here: Your First 5 Minutes</h2>
+      <p>This app helps you sell books to your coursemates and collect class dues without paper lists. Everything is stored on your own phone or computer. No account. No internet needed.</p>
+
+      <h3>The 4 pages</h3>
+      <p>There are only 4 pages. Each one has exactly one job:</p>
+      <ul>
+        <li><strong>Home</strong> — see all your coursemates and tap to record who has paid.</li>
+        <li><strong>Add &amp; Books</strong> — add new people and new books.</li>
+        <li><strong>Money</strong> — see your costs, sales, and profit. It fills itself in.</li>
+        <li><strong>Dues</strong> — collect class dues that are not for books.</li>
+      </ul>
+
+      <h3>How to move around</h3>
+      <ul>
+        <li><strong>On a phone:</strong> tap the 4 icons in the bar at the bottom of the screen.</li>
+        <li><strong>On a computer:</strong> click the 4 items in the menu on the left side.</li>
+      </ul>
+
+      <h3>Do these 3 things first</h3>
+      <ol style="margin-left: 24px; color: var(--muted); margin-bottom: 16px;">
+        <li style="margin-bottom: 8px;">Go to <strong>Add &amp; Books</strong> and add your coursemates' names.</li>
+        <li style="margin-bottom: 8px;">Still on <strong>Add &amp; Books</strong>, add the books everyone must buy, with their prices.</li>
+        <li style="margin-bottom: 8px;">Go to <strong>Home</strong>. As people pay you, tap the round button on their book.</li>
+      </ol>
+      <div class="info-box">
+        <p>Read the next pages one by one. Each page of this guide explains one page of the app.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">2</span> Home: Your Daily Dashboard</h2>
+      <p><strong>Home</strong> is where you work every day. It shows every coursemate and the books each person must buy. When somebody pays you, you record it here.</p>
+
+      <h3>The numbers at the top</h3>
+      <p>The two dark boxes show <strong>Coursemates</strong> (how many people you have added) and <strong>Books</strong> (how many different book titles exist). They update by themselves.</p>
+
+      <h3>Finding one person</h3>
+      <ul>
+        <li><strong>Search box:</strong> start typing a name or matric number. The list gets shorter as you type. Clear the box to see everyone again.</li>
+        <li><strong>Filter buttons:</strong> <strong>All</strong> shows everything. <strong>Pending</strong> shows only books people have not paid for — use this to see who still owes you. <strong>Paid</strong> and <strong>Completed</strong> show only those.</li>
+      </ul>
+
+      <h3>Recording payment: tap the round button</h3>
+      <p>Every book has a small round button on it. Each tap moves the book <strong>one step forward</strong>:</p>
+      <p style="text-align: center; font-weight: 800; color: var(--teal-900);">○ Pending &rarr; ₦ Paid &rarr; ✓ Completed &rarr; (back to Pending)</p>
+      <ul>
+        <li><span style="color:#8a5a00; font-weight:bold;">○ Pending (yellow)</span> — the person has <strong>not</strong> paid. Every new book starts here.</li>
+        <li><span style="color:#2563eb; font-weight:bold;">₦ Paid (blue)</span> — the person paid you, but you have <strong>not</strong> given them the book yet.</li>
+        <li><span style="color:#0d9488; font-weight:bold;">✓ Completed (green)</span> — the person paid <strong>and</strong> received the book. Nothing left to do.</li>
+      </ul>
+      <p>If you tap too many times, just keep tapping. It goes round in a circle and comes back.</p>
+
+      <h3>The buttons on each person</h3>
+      <ul>
+        <li><strong>+ (plus):</strong> give this one person one extra book. Other people are not affected.</li>
+        <li><strong>✎ (pencil):</strong> change the person's name or matric number, or remove them from class dues.</li>
+        <li><strong>× on a book:</strong> removes that one book from that one person only. The app will ask you to confirm first.</li>
+        <li><strong>× on the person:</strong> deletes the person and all their books. The app will ask you to confirm first.</li>
+      </ul>
+      <p>Under each name you will see progress like <strong>2/5 completed</strong>. It means 2 out of 5 books are fully completed.</p>
+
+      <h3>Export and danger zone</h3>
+      <ul>
+        <li><strong>Export CSV</strong> downloads your whole list as a spreadsheet file. This is also how you make backups.</li>
+        <li><strong>Clear All Data</strong> sits far below in the red <strong>Danger zone</strong>. It deletes <strong>everything</strong> and cannot be undone. Always export first.</li>
+      </ul>
+      <div class="info-box">
+        <p>If the list is long, use Previous and Next at the bottom to move between pages. The search box searches all pages at once.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">3</span> Adding Coursemates</h2>
+      <p>Go to <strong>Add &amp; Books</strong>, then use the <strong>Add Coursemates</strong> box. You can add one person or 100 people at once.</p>
+
+      <h3>How to type the names</h3>
+      <p>Put <strong>each person on their own line</strong>. Write the name alone, or the name, a comma, then the matric number:</p>
+      <div class="code-block">
+Adaeze Okafor, EKSU001<br>
+John Doe, EKSU002<br>
+Jane Smith
+      </div>
+      <ul>
+        <li>The comma is what separates the name from the matric number. Do not put a comma inside a name.</li>
+        <li>Matric number is optional. A person with only a name is fine.</li>
+        <li>If a name already exists, the app skips it instead of adding it twice.</li>
+      </ul>
+
+      <h3>The two checkboxes (read before you tap Add)</h3>
+      <ul>
+        <li><strong>"Assign all currently shared books":</strong> leave this ON if you already added books. Every new person will automatically receive all the books, marked Pending. Turn it OFF only if these people should start with zero books.</li>
+        <li><strong>"Exclude from Class Dues":</strong> turn this ON only if these people must never appear on the Dues page (for example, executives who do not pay dues). Everyone else should leave it OFF.</li>
+      </ul>
+      <p>Tap <strong>Add Coursemates</strong>. The box clears, and the new names appear on <strong>Home</strong> immediately.</p>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">4</span> Importing from Excel or CSV</h2>
+      <p>Use this only if you already have a long list in Excel. If you are starting fresh, typing names directly (page 3) is easier.</p>
+
+      <h3>The golden rule</h3>
+      <div class="danger-box">
+        <p>You cannot upload just any Excel file. The file must use the app's own columns. The safe method is: Export first, edit that file, then Import it back.</p>
+      </div>
+
+      <h3>Do it step by step</h3>
+      <ol style="margin-left: 24px; color: var(--muted); margin-bottom: 16px;">
+        <li style="margin-bottom: 8px;">Go to <strong>Home</strong> and tap <strong>Export CSV</strong>. A spreadsheet file downloads.</li>
+        <li style="margin-bottom: 8px;">Open that file in Excel, WPS, or Google Sheets.</li>
+        <li style="margin-bottom: 8px;">Keep the top header row exactly as it is: <code>Name</code>, <code>Matric No</code>, <code>Book</code>, <code>Status</code>. Never rename or delete these headers.</li>
+        <li style="margin-bottom: 8px;">Add one row per person. For the <code>Status</code> column, write only <code>pending</code>, <code>paid</code>, or <code>completed</code> (small letters).</li>
+        <li style="margin-bottom: 8px;">To give one person extra books, add more rows with the same name. You may leave the name empty on the extra rows.</li>
+        <li style="margin-bottom: 8px;">Save the file, keeping the <strong>.csv</strong> or <strong>.xlsx</strong> format.</li>
+        <li style="margin-bottom: 8px;">Go to <strong>Add &amp; Books</strong>, choose the file under <strong>Import Coursemates</strong>, and tap <strong>Import</strong>.</li>
+      </ol>
+      <div class="info-box">
+        <p>The app tells you how many people and books were imported. Names that already exist are not added twice. But be careful: book rows are added again on every import, so import each file only once.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">5</span> Shared Books and Prices</h2>
+      <p>A <strong>shared book</strong> is one textbook that many coursemates must buy — for example, "Introduction to Accounting". You create shared books under <strong>Add &amp; Books</strong>.</p>
+
+      <h3>Buying price vs selling price</h3>
+      <ul>
+        <li><strong>Buying price</strong> is what the book costs <em>you</em> — what you pay the lecturer or supplier.</li>
+        <li><strong>Selling price</strong> is what each student pays <em>you</em>.</li>
+      </ul>
+      <p>Example: you buy each copy at <strong>₦1,500</strong> and students pay you <strong>₦2,000</strong>. Your profit is <strong>₦500</strong> on every copy. The Money page does this maths for you.</p>
+      <div class="danger-box">
+        <p>If you leave both prices at 0, the Money page will show ₦0 profit. Always type the real prices when you add a book.</p>
+      </div>
+
+      <h3>What "Add &amp; Assign Book to Everyone" does</h3>
+      <p>One tap gives the new book to <strong>every person currently on your list</strong>, each marked Pending. People you add later also receive it automatically, as long as the "Assign all currently shared books" box is ON when you add them.</p>
+
+      <h3>The Shared Books List</h3>
+      <p>Below the form, the list shows every shared book with two counts: <strong>Paid</strong> (how many people paid but have no book yet) and <strong>Completed</strong> (how many finished everything).</p>
+      <ul>
+        <li><strong>✎ (pencil):</strong> change the book title or its prices. New prices apply to the Money maths immediately.</li>
+        <li><strong>× (cross):</strong> removes this book from <strong>everyone</strong> at once. The app will ask you to confirm first.</li>
+      </ul>
+      <div class="info-box">
+        <p>Need to give a book to only one person instead of everyone? Go to <strong>Home</strong> and tap the <strong>+</strong> button on that person's row.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">6</span> Money and Profit</h2>
+      <p>The <strong>Money</strong> page is fully automatic. You never type anything here. It reads your Home records and calculates profit for you.</p>
+
+      <h3>Only paid books count</h3>
+      <p>Only books marked <strong>Paid</strong> or <strong>Completed</strong> enter the maths. Books still <strong>Pending</strong> are ignored, because no money has moved yet.</p>
+
+      <h3>The three big numbers</h3>
+      <ul>
+        <li><strong>Total Cost</strong> — what you spent. Buying price × number of paid books.</li>
+        <li><strong>Total Revenue</strong> — what students paid you. Selling price × number of paid books.</li>
+        <li><strong>Total Profit</strong> — Revenue minus Cost. The box turns <strong>green</strong> when you are gaining and <strong>red</strong> when you are losing.</li>
+      </ul>
+      <p>Worked example: 10 students paid for a book you buy at ₦1,500 and sell at ₦2,000. Cost = 10 × ₦1,500 = <strong>₦15,000</strong>. Revenue = 10 × ₦2,000 = <strong>₦20,000</strong>. Profit = <strong>₦5,000</strong>.</p>
+
+      <h3>The table below</h3>
+      <p>Each row is one book, so you can see which book makes the most profit. The last <strong>Total</strong> row adds everything up.</p>
+      <div class="danger-box">
+        <p><strong>Clear Financials</strong> deletes all books and all money records. Your people list stays, but every book assignment is gone. Export a backup before you touch it.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">7</span> Class Dues</h2>
+      <p>Use the <strong>Dues</strong> page for money that is NOT for books — for example, department or association dues where everybody pays the same fixed amount.</p>
+
+      <h3>Step 1: set the amount</h3>
+      <p>Type one fixed amount at the top (for example <strong>₦5,000</strong>) and tap <strong>Save Amount</strong>. Every person on the list now owes exactly that amount.</p>
+      <p>The two dark boxes update at once: <strong>Total Dues Expected</strong> (amount × number of people — 40 people × ₦5,000 = ₦200,000) and <strong>Total Dues Collected</strong> (amount × number of people you have ticked).</p>
+
+      <h3>Step 2: tick people as they pay</h3>
+      <p>Each row has a round button. Tap <strong>✓</strong> when a person pays — their row turns blue and says Paid. Tapped by mistake? Tap the <strong>✗</strong> to change them back to Pending. Nothing is permanent.</p>
+      <ul>
+        <li><strong>Search box and filters</strong> work exactly like on Home. Use the Pending filter to see who still owes.</li>
+        <li><strong>✖ (second button):</strong> removes this person from the Dues page only. They stay on Home with all their books.</li>
+        <li><strong>Export Dues CSV</strong> downloads the dues list as a spreadsheet. Keep it as your receipt record.</li>
+      </ul>
+
+      <h3>People who must not pay dues</h3>
+      <p>Anyone ticked <strong>"Exclude from Class Dues"</strong> is hidden from this page and is NOT counted in Total Expected. To bring such a person back: go to <strong>Home</strong>, tap <strong>✎</strong> on their row, uncheck the box, and save.</p>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">8</span> Backing Up Your Data</h2>
+      <p>Your records live <strong>only inside this browser on this device</strong>. That keeps things private and fast, but it also means your records disappear if you clear your browser history, use incognito mode, reset your phone, or move to a new phone. Backups protect you.</p>
+
+      <h3>Step 1: download your backups</h3>
+      <ol style="margin-left: 24px; color: var(--muted); margin-bottom: 16px;">
+        <li style="margin-bottom: 8px;">Go to <strong>Add &amp; Books</strong> and scroll to <strong>"Your Data &amp; Backups"</strong>.</li>
+        <li style="margin-bottom: 8px;">Tap <strong>Download Books Backup (CSV)</strong> and <strong>Download Dues Backup (CSV)</strong>.</li>
+        <li style="margin-bottom: 8px;">Keep the two files somewhere safe — your phone storage, Google Drive, or send them to yourself on WhatsApp.</li>
+      </ol>
+
+      <h3>Step 2: restore when you need to</h3>
+      <ol style="margin-left: 24px; color: var(--muted); margin-bottom: 16px;">
+        <li style="margin-bottom: 8px;">Open the app in your (new) browser.</li>
+        <li style="margin-bottom: 8px;">Go to <strong>Add &amp; Books</strong> and upload your saved Books CSV with the <strong>Import</strong> tool.</li>
+        <li style="margin-bottom: 8px;">Your people, books, and book statuses come back.</li>
+      </ol>
+      <div class="danger-box">
+        <p>Know what a backup does NOT bring back: book <strong>prices</strong>, the dues <strong>amount</strong>, and dues <strong>paid ticks</strong>. After restoring, type the prices again, save the dues amount again, and re-tick who paid using your Dues CSV as the record.</p>
+      </div>
+      <div class="info-box">
+        <p>Make it a habit: download fresh backups at the end of every week you collect money.</p>
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <h2><span class="step-num">9</span> Fixing Common Problems</h2>
+      <p>Quick answers to the problems people meet most:</p>
+      <ul>
+        <li><strong>I cannot find a name.</strong> Clear the search box, tap the <strong>All</strong> filter, and check other pages with Previous and Next. The person may be on another page.</li>
+        <li><strong>I added the same person twice.</strong> Open one of the rows and tap <strong>✎</strong> to confirm which one is correct, then tap <strong>×</strong> on the wrong one to delete it.</li>
+        <li><strong>I tapped the status button too far.</strong> Keep tapping. It moves Pending → Paid → Completed → Pending in a circle.</li>
+        <li><strong>Money shows ₦0.</strong> Two usual causes: the book prices are still 0 (fix them with ✎ in the Shared Books List), or nobody is marked Paid yet.</li>
+        <li><strong>A person is missing from Dues.</strong> They were excluded. Go to Home, tap ✎ on their row, uncheck "Exclude from Class Dues", and save.</li>
+        <li><strong>I deleted something by mistake.</strong> Delete cannot be undone. Import your latest backup CSV to bring the records back, then re-type prices and re-tick dues.</li>
+        <li><strong>I changed phones and everything is gone.</strong> The records lived in your old browser. If you have a backup CSV, import it. If not, you must add everything afresh — this is why weekly backups matter.</li>
+      </ul>
+    </div>
+
+
+    <div class="guide-nav">
+      <button class="btn-nav btn-secondary" id="prevBtn" onclick="changeSlide(-1)" disabled>← Previous</button>
+      <span class="guide-progress" id="stepIndicator">Step 1 of X</span>
+      <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const sections = document.querySelectorAll('.guide-section');
+  const dotsContainer = document.getElementById('progressDots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const stepIndicator = document.getElementById('stepIndicator');
+
+  // Initialize dots
+  sections.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  });
+  
+  const dots = document.querySelectorAll('.dot');
+
+  function updateUI() {
+    sections.forEach((sec, i) => {
+      sec.classList.toggle('active', i === currentSlide);
+      dots[i].classList.toggle('active', i === currentSlide);
+    });
+
+    prevBtn.disabled = currentSlide === 0;
+    
+    if (currentSlide === sections.length - 1) {
+      nextBtn.textContent = 'Go to App →';
+      nextBtn.onclick = () => window.location.href = 'index.html';
+    } else {
+      nextBtn.textContent = 'Next →';
+      nextBtn.onclick = () => changeSlide(1);
+    }
+
+    stepIndicator.textContent = `Step ${currentSlide + 1} of ${sections.length}`;
+  }
+
+  function changeSlide(dir) {
+    currentSlide += dir;
+    if (currentSlide < 0) currentSlide = 0;
+    if (currentSlide >= sections.length) currentSlide = sections.length - 1;
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Set initial state
+  updateUI();
+</script>
+
+</body>
+</html>
